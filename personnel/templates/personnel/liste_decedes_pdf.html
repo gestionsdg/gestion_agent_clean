@@ -1,0 +1,19 @@
+<h2>{{ titre }}</h2>
+<table>
+  <thead>
+    <tr>
+      {% for col in colonnes %}
+        <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ligne in donnees %}
+      <tr>
+        {% for cellule in ligne %}
+          <td class="{% if forloop.counter0 == 1 or forloop.counter0 == 6 %}left{% endif %}">{{ cellule }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,95 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titre }}</title>
+    <style>
+        @media print {
+            .no-print, .no-print * {
+                display: none !important;
+            }
+            .entite-col {
+                display: none !important;
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+        }
+        td {
+            font-size: 10px;
+        }
+        th {
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        td.center {
+            text-align: center;
+        }
+        td.left {
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        th.col-nom, td.col-nom {
+            width: 190px;
+        }
+        th.col-grade, td.col-grade {
+            width: 170px;
+        }
+        th.col-fonction, td.col-grade {
+            width: 180px;
+        }
+        th.col-date, td.col-date {
+            width: 80px;
+        }
+        th.col-duree, td.col-duree {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ titre }}</h2>
+
+    <button class="no-print" onclick="window.print();" style="margin-bottom: 15px;">Imprimer</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Grade actuel</th>
+                <th>Service</th>
+                <th>Date affectation</th>
+                <th>Durée affectation</th>
+                <th class="entite-col">Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in donnees %}
+            <tr>
+                <td class="center">{{ item.0 }}</td>
+                <td class="left">{{ item.1 }}</td>
+                <td class="center">{{ item.2 }}</td>
+                <td class="left">{{ item.3 }}</td>
+                <td class="left">{{ item.4 }}</td>
+                <td class="center">{{ item.5 }}</td>
+                <td class="center">{{ item.6 }}</td>
+                <td class="entite-col left">{{ item.7 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

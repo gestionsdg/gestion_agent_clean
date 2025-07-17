@@ -1,0 +1,38 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">
+  Liste des agents démissionnaires
+</h2>
+
+<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
+	  <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Grade actuel</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date engagement</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date démission</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Carrière</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for num, emp in agents %}
+    <tr>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ num }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.nom|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.matricule|default:"-" }}</td>
+	  <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.grade_actuel|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.sexe|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_engagement|date:"d/m/Y" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_statut|date:"d/m/Y" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.carriere|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.entite|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

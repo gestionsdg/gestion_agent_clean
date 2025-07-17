@@ -1,0 +1,109 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titre }}</title>
+    <style>
+        @media print {
+            .no-print, .no-print * {
+                display: none !important;
+            }
+            .entite-col {
+                display: none !important;
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+            font-size: 13px;
+        }
+        th {
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        td.center {
+            text-align: center;
+        }
+        td.left {
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+			text-decoration: underline;
+            margin-bottom: 10px;
+        }
+        .btn-retour {
+            margin-bottom: 10px;
+        }
+        .highlight-age {
+            background-color: #d0e7ff;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ titre }}</h2>
+
+    <div class="no-print btn-retour">
+        <a href="{% url 'liste_employes' %}">
+            <button style="background-color: blue; color: white;">⬅ Retour à la liste des employés</button>
+        </a>
+        <a href="{% url 'liste_controleurs_pdf' %}?entite={{ selected_entite }}" target="_blank">
+            <button style="background-color: darkgreen; color: white;">🖨️ Imprimer (PDF)</button>
+        </a>
+    </div>
+
+    <div class="no-print">
+        <form method="get">
+            <label for="entite">Trier par entité :</label>
+            <select name="entite" id="entite" onchange="this.form.submit()">
+                <option value="">-- Choisir une entité --</option>
+                {% for e in entites %}
+                    <option value="{{ e }}" {% if selected_entite == e %}selected{% endif %}>{{ e }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Grade actuel</th>
+                <th>Sexe</th>
+                <th>Fonction</th>
+                <th>Date naissance</th>
+                <th>Age</th>
+                <th>Date affectation</th>
+                <th>Durée affectation</th>
+                <th class="entite-col">Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in donnees %}
+            <tr {% if item.7 >= 55 %}class="highlight-age"{% endif %}>
+                <td class="center">{{ item.0 }}</td>
+                <td class="left">{{ item.1 }}</td>
+                <td class="center">{{ item.2 }}</td>
+                <td class="left">{{ item.3 }}</td>
+                <td class="center">{{ item.4 }}</td>
+                <td class="left">{{ item.5 }}</td>
+                <td class="center">{{ item.6 }}</td>
+                <td class="center">{{ item.7 }} an{% if item.7 > 1 %}s{% endif %}</td>
+                <td class="center">{{ item.8 }}</td>
+                <td class="center">{{ item.9 }}</td>
+                <td class="entite-col left">{{ item.10 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

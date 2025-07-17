@@ -1,0 +1,32 @@
+/* Centrer le contenu de l'administration Django */
+#content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Agrandir et centrer le logo */
+#site-name {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Masquer les actions récentes */
+.module ul.actionlist {
+    display: none;
+}
+
+/* Centrer le titre principal */
+.dashboard-module h2 {
+    text-align: center;
+}
+
+/* Centrer le bloc de bienvenue */
+.dashboard-module .welcome {
+    text-align: center;
+}
+
+/* Ajout d'un fond léger pour embellir l'interface (optionnel) */
+body.dashboard #container {
+    background-color: #f4f4f4;
+}

@@ -1,0 +1,51 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block sidebar %}
+  {# Masquer les actions récentes à droite #}
+{% endblock %}
+
+{% block content %}
+  {{ block.super }}
+
+  <style>
+    #content {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .custom-shortcut {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 6px;
+    }
+
+    .custom-shortcut a {
+      text-decoration: none;
+      font-weight: bold;
+      background-color: #1890ff;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 4px;
+      margin: 10px;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+    }
+
+    .custom-shortcut a:hover {
+      background-color: #40a9ff;
+    }
+  </style>
+
+  <div class="custom-shortcut">
+    <h2>Raccourcis personnalisés</h2>
+    <p style="margin-top: 15px;">
+      <a href="{% url 'liste_employes' %}">👥 Accéder à la liste des employés</a>
+      <a href="{% url 'dashboard' %}">📊 Tableau de bord</a>
+    </p>
+  </div>
+{% endblock %}

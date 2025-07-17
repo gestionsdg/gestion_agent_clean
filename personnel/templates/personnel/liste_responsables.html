@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titre }}</title>
+    <style>
+        @page {
+            size: landscape;
+        }
+        @media print {
+            .no-print, .no-print * {
+                display: none !important;
+            }
+            .entite-col {
+                display: none !important;
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+        }
+        th {
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        td.center {
+            text-align: center;
+        }
+        td.left {
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ titre }}</h2>
+		<div class="no-print" style="margin-bottom: 15px;">
+        <a href="{% url 'liste_employes' %}"><button style="background-color: blue; color: white;">⬅ Retour à la liste des employés</button></a>
+    </div>
+
+    <div class="no-print" style="margin-bottom: 10px;">
+        <form method="get">
+            <label for="entite">Filtrer par entité :</label>
+            <select name="entite" id="entite">
+                <option value="">-- Toutes les entités --</option>
+                {% for e in entites %}
+                <option value="{{ e }}" {% if e == entite_choisie %}selected{% endif %}>{{ e }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filtrer</button>
+        </form>
+        <br>
+        <button onclick="window.print();">Imprimer</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Grade actuel</th>
+                <th>Sexe</th>
+				<th>Service</th>
+                <th>Fonction</th>
+				<th>Date affectation</th>
+                <th>Durée affectation</th>
+                <th class="entite-col">Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in donnees %}
+            <tr>
+                <td class="center">{{ item.0 }}</td>
+                <td class="left">{{ item.1 }}</td>
+                <td class="center">{{ item.2 }}</td>
+                <td class="left">{{ item.3 }}</td>
+                <td class="center">{{ item.4 }}</td> <!-- Sexe -->
+				<td class="left">{{ item.5 }}</td>
+                <td class="left">{{ item.6 }}</td> <!-- Fonction -->
+				<td class="center">{{ item.7 }}</td>
+                <td class="center">{{ item.8 }}</td>
+                <td class="entite-col left">{{ item.9 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

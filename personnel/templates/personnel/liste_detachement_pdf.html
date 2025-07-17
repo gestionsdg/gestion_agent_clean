@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: "DejaVu Sans", sans-serif;
+      font-size: 12px;
+    }
+    h2 {
+      text-align: center;
+      text-decoration: underline;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+    th {
+      background-color: #e0e0e0;
+      text-align: center;
+    }
+    td.center {
+      text-align: center;
+    }
+    td.left {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<h2>{{ titre|safe }}</h2>
+
+<table>
+  <thead>
+    <tr>
+      {% for col in colonnes %}
+        <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in donnees %}
+    <tr>
+      {% for val in item %}
+        <td class="{% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 6 %}center{% else %}left{% endif %}">
+          {{ val|default:"-" }}
+        </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>

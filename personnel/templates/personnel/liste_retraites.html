@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 style="text-align: center; font-size: 20px; margin-bottom: 20px; text-decoration: underline; font-weight: bold;">Liste des Agents Retraités</h2>
+
+<!-- BOUTONS -->
+<div class="actions">
+  <a href="{% url 'liste_retraites_pdf' %}" target="_blank">
+    <button class="btn-imprimer">🖨️ Imprimer PDF</button>
+  </a>
+    <a href="{% url 'liste_employes' %}">
+        <button class="btn-retour">⬅ Retour à la liste des employés</button>
+    </a>
+    <button class="btn-imprimer" onclick="window.print()">🖨️ Imprimer</button>
+</div>
+
+<!-- TABLEAU -->
+<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+  <thead>
+    <tr style="background-color: #e0e0e0;">
+      <th style="text-align: center;">N°</th>
+      <th style="text-align: left;">Nom</th>
+      <th style="text-align: center;">Matricule</th>
+      <th style="text-align: center;">Sexe</th>
+      <th style="text-align: center;">Date naissance</th>
+      <th style="text-align: center;">Date retraite</th>
+      <th style="text-align: center;">Âge départ</th>
+      <th style="text-align: center;">Date engagement</th>
+      <th style="text-align: center;">Carrière</th>
+      <th style="text-align: left;">Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in donnees %}
+    <tr>
+      {% for val in item %}
+        <td style="
+			border: 1px solid #ccc;
+			padding: 6px;
+			{% if forloop.counter == 2 or forloop.counter == 10 %}text-align: left;
+			{% else %}text-align: center;
+			{% endif %}
+		">
+			{{ val|default:"-" }}
+		</td>
+
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- STYLES -->
+<style>
+    .actions {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+    .btn-retour, .btn-imprimer {
+        padding: 6px 12px;
+        margin-left: 8px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    .btn-retour {
+        background-color: #888;
+    }
+    .btn-imprimer {
+        background-color: #007BFF;
+    }
+
+    @media print {
+        .actions {
+            display: none;
+        }
+        @page {
+            size: landscape;
+        }
+    }
+</style>
+{% endblock %}

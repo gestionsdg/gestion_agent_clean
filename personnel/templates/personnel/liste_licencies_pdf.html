@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: landscape;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+        }
+        h2 {
+            text-align: center;
+            text-decoration: underline;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            border: 1px solid #444;
+            padding: 6px;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        td {
+            border: 1px solid #444;
+            padding: 6px;
+        }
+        .center {
+            text-align: center;
+        }
+        .left {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>{{ titre }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            {% for col in colonnes %}
+                <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in donnees %}
+        <tr>
+            {% for val in item %}
+                {% if forloop.counter == 8 %}
+                    <td class="center">
+                        {% if val|default:""|stringformat:"i" == "1" or val == 1 %}
+                            {{ val }} an
+                        {% elif val %}
+                            {{ val }} ans
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                {% elif forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 6 or forloop.counter == 7 %}
+                    <td class="center">{{ val|default:"-" }}</td>
+                {% else %}
+                    <td class="left">{{ val|default:"-" }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="text-align: center; margin-top: 80px;">
+    <h1 style="font-size: 32px; font-weight: bold;">Bienvenue sur la plateforme de gestion du personnel de la CNSS</h1>
+    <p style="font-size: 18px; margin-top: 20px;">Cliquez ci-dessous pour accéder au tableau de bord.</p>
+    
+    <a href="{% url 'dashboard' %}">
+      <button style="margin-top: 30px; padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+        Accéder au Tableau de bord
+      </button>
+    </a>
+  </div>
+{% endblock %}

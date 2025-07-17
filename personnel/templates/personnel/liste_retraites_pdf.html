@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">
+  Liste des agents retraités
+</h2>
+
+<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 70px;">Date de naissance</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 80px;">Date départ retraite</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Âge départ</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 70px;">Date engagement</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Carrière</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: left; width: 200px;">Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for num, emp in agents %}
+    <tr style="text-align: center;">
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ num }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.nom|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.matricule|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.sexe|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_naissance|date:"d/m/Y" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_statut|date:"d/m/Y" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.age_depart|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_engagement|date:"d/m/Y" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.carriere|default:"-" }}</td>
+      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.entite|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

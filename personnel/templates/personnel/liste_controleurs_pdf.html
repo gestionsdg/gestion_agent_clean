@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titre }}</title>
+    <style>
+        @media print {
+            .entite-col {
+                display: none !important;
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+            font-size: 13px;
+        }
+        th {
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        td.center {
+            text-align: center;
+        }
+        td.left {
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+			text-decoration: underline;
+            margin-bottom: 10px;
+        }
+        .highlight-age {
+            background-color: #d0e7ff !important;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ titre|safe }}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Grade actuel</th>
+                <th>Sexe</th>
+                <th>Fonction</th>
+                <th>Date naissance</th>
+                <th>Âge</th>
+                <th>Date affectation</th>
+                <th>Durée affectation</th>
+                <th class="entite-col">Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in donnees %}
+            <tr {% if item.7|add:0 >= 55 %}class="highlight-age"{% endif %}>
+                <td class="center">{{ item.0 }}</td>
+                <td class="left">{{ item.1 }}</td>
+                <td class="center">{{ item.2 }}</td>
+                <td class="left">{{ item.3 }}</td>
+                <td class="center">{{ item.4 }}</td>
+                <td class="left">{{ item.5 }}</td>
+                <td class="center">{{ item.6 }}</td>
+                <td class="center">
+                    {% if item.7 != '-' %}
+                        {{ item.7 }} an{% if item.7 > 1 %}s{% endif %}
+                    {% else %}-{% endif %}
+                </td>
+                <td class="center">{{ item.8 }}</td>
+                <td class="center">
+                    {% if item.9 != '-' %}
+                        {{ item.9 }} an{% if item.9 > 1 %}s{% endif %}
+                    {% else %}-{% endif %}
+                </td>
+                <td class="entite-col left">{{ item.10 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

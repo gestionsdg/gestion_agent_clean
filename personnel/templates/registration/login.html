@@ -1,0 +1,104 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion CNSS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+
+    .logo {
+      max-height: 80px;
+      width: auto;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    .logo-text {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type="submit"] {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    .admin-link {
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" class="logo">
+  <div class="logo-text">Caisse Nationale de Sécurité Sociale</div>
+
+  {% if form.errors %}
+    <div class="error">Nom d'utilisateur ou mot de passe incorrect</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.username.label_tag }}
+    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+    
+    {{ form.password.label_tag }}
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    
+    <input type="submit" value="Connexion">
+  </form>
+
+  <div class="admin-link">
+    {% if user.is_authenticated and user.is_superuser %}
+		<a href="/admin/" style="color: purple;">Accéder à l'interface Admin</a>
+	{% else %}
+		<span style="color: grey; cursor: not-allowed;" title="Accès réservé à l'Administrateur RH">Accéder à l'interface Admin</span>
+	{% endif %}
+
+  </div>
+</div>
+
+</body>
+</html>
+

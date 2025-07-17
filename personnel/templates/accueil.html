@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div style="max-width: 1100px; margin: 50px auto; padding: 40px; min-height: 450px; border: 2px solid #007bff; border-radius: 15px; background-color: #d4edda; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
+    <!-- Logo CNSS -->
+    <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="width: 220px; margin-bottom: 5px;">
+
+    <!-- Texte en dessous du logo -->
+    <div style="font-size: 22px; font-weight: bold; color: green; margin-top: 0; margin-bottom: 20px;">
+      CAISSE NATIONALE DE SECURITE SOCIALE
+    </div>
+
+    <!-- Titre principal -->
+    <h1 style="font-size: 35px; font-weight: bold; color: #003366;">
+      Bienvenue sur la plateforme de gestion administrative du personnel
+    </h1>
+
+    <!-- Sous-texte -->
+    <p style="font-size: 20px; margin-top: 20px;">
+      Cliquez ci-dessous pour accéder au tableau de bord.
+    </p>
+
+    <!-- Bouton vers le tableau de bord -->
+    <a href="{% url 'dashboard' %}">
+      <button style="margin-top: 30px; padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+        Accéder au Tableau de bord
+      </button>
+    </a>
+  </div>
+{% endblock %}

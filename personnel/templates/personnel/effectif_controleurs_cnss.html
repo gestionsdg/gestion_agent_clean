@@ -1,0 +1,60 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  h2 {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid #333;
+    padding: 6px;
+  }
+  th {
+    text-align: center;
+    background-color: #f2f2f2;
+  }
+  td.center {
+    text-align: center;
+  }
+  td.left {
+    text-align: left;
+  }
+</style>
+
+<h2>Effectif des Contrôleurs de la CNSS</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Effectif &lt; 55 ans</th>
+      <th>Âges &lt; 55 ans</th>
+      <th>Effectif ≥ 55 ans</th>
+      <th>Âges ≥ 55 ans</th>
+      <th>Total Effectif</th>
+      <th>Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in donnees %}
+    <tr>
+      <td class="center">{{ forloop.counter }}</td>
+      <td class="center">{{ row.effectif_moins_55|default:"-" }}</td>
+      <td class="center">{{ row.ages_moins_55|default:"-" }}</td>
+      <td class="center">{{ row.effectif_plus_54|default:"-" }}</td>
+      <td class="center">{{ row.ages_plus_54|default:"-" }}</td>
+      <td class="center">{{ row.total|default:"-" }}</td>
+      <td class="left">{{ row.entite|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  @media print {
+    form, .noprint {
+      display: none;
+    }
+  }
+
+  h2 {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th, td {
+    border: 1px solid #333;
+    padding: 4px;
+    text-align: center;
+  }
+
+  th.left, td.left {
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .bg-fonction {
+    background-color: #cce5ff; /* bleu ciel */
+  }
+
+  .bg-grade {
+    background-color: #d4edda; /* vert clair */
+  }
+</style>
+
+<h2>{{ titre }}</h2>
+
+<form method="get" class="noprint">
+  <label for="entite">Filtrer par entité :</label>
+  <select name="entite" id="entite" onchange="this.form.submit()">
+    <option value="">-- Toutes les entités --</option>
+    {% for ent in entites %}
+      <option value="{{ ent }}" {% if selected_entite == ent %}selected{% endif %}>{{ ent }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      {% for col in colonnes %}
+        <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ligne in donnees %}
+    {% with fonction=ligne.6 grade=ligne.3 %}
+    <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade == 'Chef de Sce Adjt' or grade == 'Chef de Section' or grade == 'Rédacteur Ppal' or grade == 'Rédacteur' %}bg-grade{% endif %}">
+      {% for val in ligne %}
+        {% if forloop.counter0 == 1 or forloop.counter0 == 3 or forloop.counter0 == 5 or forloop.counter0 == 6 %}
+          <td class="left">{{ val|default:"-" }}</td>
+        {% else %}
+          <td>{{ val|default:"-" }}</td>
+        {% endif %}
+      {% endfor %}
+    </tr>
+    {% endwith %}
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="noprint" style="margin-top: 10px;">
+  <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
+</div>
+{% endblock %}

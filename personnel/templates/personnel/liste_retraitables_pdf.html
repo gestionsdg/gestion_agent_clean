@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: "DejaVu Sans", sans-serif;
+      font-size: 12px;
+    }
+    h2 {
+      text-align: center;
+      text-decoration: underline;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 5px;
+      text-align: center; /* Centrage général pour uniformité */
+    }
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    td.left {
+      text-align: left;
+    }
+    .highlight-blue {
+      background-color: #87CEEB;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Liste des Cadres et Agents retraitables</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Matricule</th>
+      <th>Grade actuel</th>
+      <th>Sexe</th>
+      <th>Date de naissance</th>
+      <th>Âge</th>
+      <th>Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for emp in retraitables %}
+    <tr {% if emp.highlight %}class="highlight-blue"{% endif %}>
+      <td>{{ forloop.counter }}</td>
+      <td class="left">{{ emp.nom }}</td>
+      <td>{{ emp.matricule }}</td>
+      <td class="left">{{ emp.grade }}</td>
+      <td>{{ emp.sexe }}</td>
+      <td>{{ emp.date_naissance|date:"d/m/Y" }}</td>
+      <td>{{ emp.age_str }}</td>
+      <td class="left">{{ emp.entite }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>

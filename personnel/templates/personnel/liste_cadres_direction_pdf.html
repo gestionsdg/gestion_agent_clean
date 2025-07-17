@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadres de Direction</title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 13px;">
+
+    <h2 style="text-align: center;"><u>Les Cadres de Direction : {{ entite }}</u></h2>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #e0e0e0;">
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Fonction</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date affectation</th>
+                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Durée affectation</th>
+				<th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Âge</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.0 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: left;">{{ ligne.1 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.2 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.4 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: left;">{{ ligne.5 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.6 }}</td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.7 }}</td>
+				<td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.8 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

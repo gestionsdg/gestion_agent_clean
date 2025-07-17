@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+{% endblock %}
+
+{% block branding %}
+    <div style="text-align: center; padding-top: 10px;">
+        <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; margin-bottom: 5px;"><br>
+        <span style="font-weight: bold; font-size: 18px;">Caisse Nationale de Sécurité Sociale</span>
+    </div>
+{% endblock %}

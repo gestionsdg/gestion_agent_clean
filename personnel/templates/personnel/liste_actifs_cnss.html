@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 style="text-align: center; font-size: 22px; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">
+  Les Agents actifs de la CNSS
+</h2>
+
+<!-- BOUTONS ACTIONS -->
+<div class="actions" style="text-align: center; margin-bottom: 20px;">
+  <a href="{% url 'dashboard' %}">
+    <button class="btn-retour">⬅ Retour au Tableau de bord</button>
+  </a>
+  <button class="btn-imprimer" onclick="window.print()">🖨️ Imprimer</button>
+</div>
+
+<!-- TABLEAU -->
+<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+  <thead>
+    <tr style="background-color: #e0e0e0;">
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Grade actuel</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Service</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Fonction</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date affectation</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Durée affectation</th>
+      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for numero, agent in agents %}
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ numero }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ agent.nom }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ agent.matricule }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ agent.sexe }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ agent.grade_actuel }}</td>
+		<td style="border: 1px solid #ccc; padding: 6px; text-align: left;">
+			{% if agent.service and agent.service != "nan" %}{{ agent.service }}{% else %}-{% endif %}
+		</td>
+		<td style="border: 1px solid #ccc; padding: 6px; text-align: left;">
+			{% if agent.fonction and agent.fonction != "nan" %}{{ agent.fonction }}{% else %}-{% endif %}
+		</td>
+
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">
+          {{ agent.date_affectation|date:"d/m/Y" }}
+        </td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ agent.duree_affectation }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ agent.entite }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- STYLES -->
+<style>
+  @media print {
+    .actions {
+      display: none;
+    }
+  }
+
+  .btn-retour, .btn-imprimer {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 14px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-retour:hover, .btn-imprimer:hover {
+    opacity: 0.9;
+  }
+</style>
+{% endblock %}

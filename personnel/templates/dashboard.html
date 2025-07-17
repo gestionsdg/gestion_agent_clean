@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+  <h2 style="font-size: 26px; font-weight: bold; text-decoration: underline; margin: 0 auto;">
+    Tableau de Bord
+  </h2>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 40px;">
+  <a href="{% url 'liste_employes' %}">
+    <div class="card-dashboard" style="background-color: #007bff; color: white;">
+      <div style="font-size: 60px;">👥</div>
+      <div style="font-size: 18px; font-weight: bold;">Total Agents</div>
+      <div style="font-size: 30px;">{{ total }}</div>
+    </div>
+  </a>
+
+  <!-- ✅ Redirige désormais vers la liste actifs CNSS -->
+  <a href="{% url 'liste_actifs_cnss' %}">
+    <div class="card-dashboard" style="background-color: #28a745; color: white;">
+      <div style="font-size: 60px;">✅</div>
+      <div style="font-size: 18px; font-weight: bold;">Agents Actifs</div>
+      <div style="font-size: 30px;">{{ actifs }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_retraites_pdf' %}">
+    <div class="card-dashboard" style="background-color: #ffc107; color: black;">
+      <div style="font-size: 60px;">👴</div>
+      <div style="font-size: 18px; font-weight: bold;">Retraités</div>
+      <div style="font-size: 30px;">{{ retraites }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_decedes_pdf' %}">
+    <div class="card-dashboard" style="background-color: #dc3545; color: white;">
+      <div style="font-size: 60px;">⚰️</div>
+      <div style="font-size: 18px; font-weight: bold;">Agents décédés</div>
+      <div style="font-size: 30px;">{{ decedes }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_licencies_pdf' %}">
+    <div class="card-dashboard" style="background-color: #6c757d; color: white;">
+      <div style="font-size: 60px;">❌</div>
+      <div style="font-size: 18px; font-weight: bold;">Agents licenciés</div>
+      <div style="font-size: 30px;">{{ licences }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_demissionnaires_pdf' %}">
+    <div class="card-dashboard" style="background-color: #17a2b8; color: white;">
+      <div style="font-size: 60px;">📤</div>
+      <div style="font-size: 18px; font-weight: bold;">Démissionnaires</div>
+      <div style="font-size: 30px;">{{ demissionnaires }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_detachement_pdf' %}">
+    <div class="card-dashboard" style="background-color: #20c997; color: white;">
+      <div style="font-size: 60px;">🧳</div>
+      <div style="font-size: 18px; font-weight: bold;">Agents en détachement</div>
+      <div style="font-size: 30px;">{{ en_detachement }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_disponibilite_pdf' %}">
+    <div class="card-dashboard" style="background-color: #6610f2; color: white;">
+      <div style="font-size: 60px;">📂</div>
+      <div style="font-size: 18px; font-weight: bold;">Mise en disponibilité</div>
+	  <div style="font-size: 30px;">{{ en_disponibilite }}</div>
+    </div>
+  </a>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+  <a href="{% url 'liste_employes' %}">
+    <button class="btn btn-secondary">⬅ Retour à la liste des agents</button></a>
+	{% if is_admin_rh %}
+		<a href="/admin/" style="margin-left: auto;">
+			<button class="btn btn-secondary">⬅ Retour à l'Interface Admin</button>
+		</a>
+	{% endif %}
+
+</div>
+
+<style>
+  .card-dashboard {
+    width: 200px;
+    height: 140px;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .card-dashboard:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    margin: 5px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+</style>
+{% endblock %}
