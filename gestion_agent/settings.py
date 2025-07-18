@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY', default='change-me')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['gestion-agent.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
