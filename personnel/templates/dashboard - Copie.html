@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
@@ -16,6 +15,7 @@
     </div>
   </a>
 
+  <!-- ✅ Redirige désormais vers la liste actifs CNSS -->
   <a href="{% url 'liste_actifs_cnss' %}">
     <div class="card-dashboard" style="background-color: #28a745; color: white;">
       <div style="font-size: 60px;">✅</div>
@@ -68,20 +68,20 @@
     <div class="card-dashboard" style="background-color: #6610f2; color: white;">
       <div style="font-size: 60px;">📂</div>
       <div style="font-size: 18px; font-weight: bold;">Mise en disponibilité</div>
-      <div style="font-size: 30px;">{{ en_disponibilite }}</div>
+	  <div style="font-size: 30px;">{{ en_disponibilite }}</div>
     </div>
   </a>
 </div>
 
 <div style="text-align: center; margin-top: 30px;">
   <a href="{% url 'liste_employes' %}">
-    <button class="btn btn-secondary">⬅ Retour à la liste des agents</button>
-  </a>
-  {% if is_admin_rh %}
-    <a href="/admin/" style="margin-left: auto;">
-      <button class="btn btn-secondary">⬅ Retour à l'Interface Admin</button>
-    </a>
-  {% endif %}
+    <button class="btn btn-secondary">⬅ Retour à la liste des agents</button></a>
+	{% if is_admin_rh %}
+		<a href="/admin/" style="margin-left: auto;">
+			<button class="btn btn-secondary">⬅ Retour à l'Interface Admin</button>
+		</a>
+	{% endif %}
+
 </div>
 
 <style>

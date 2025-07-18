@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,16 +9,8 @@
         th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
         th { background-color: #f2f2f2; }
     </style>
-    {% load static %}
 </head>
 <body>
-
-    <!-- Logo CNSS centré -->
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="width: 220px;">
-        <div style="font-weight: bold; font-size: 18px; margin-top: 5px;">Caisse Nationale de Sécurité Sociale</div>
-    </div>
-
     {% block content %}
     {% endblock %}
 </body>
