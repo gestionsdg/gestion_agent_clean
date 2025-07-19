@@ -4,10 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 
-from personnel import views  # ✅ Ajoutez cette ligne !
+from personnel.views import accueil, liste_employes  # ✅ Import direct
 from personnel.views_dashboard import tableau_de_bord
 from django.contrib.auth import views as auth_views
-from personnel.views import accueil
 
 urlpatterns = [
     # Accueil
@@ -24,7 +23,7 @@ urlpatterns = [
     path('dashboard/', tableau_de_bord, name='dashboard'),
 
     # Inclusion des URLs de l'application personnel
-    path('employes/', views.liste_employes, name='liste_employes')
+    path('employes/', liste_employes, name='liste_employes'),  # ✅ Correction ici
 ]
 
 # Fichiers médias (pour DEBUG = True)
