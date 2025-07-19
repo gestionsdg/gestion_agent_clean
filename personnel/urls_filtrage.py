@@ -1,0 +1,13 @@
+from django.urls import path
+from . import views_export  # ou le fichier où sont vos vues
+
+urlpatterns = [
+    path('retraitables/', views_export.liste_retraites, name='liste_retraites'),
+    path('demissionnaires/', views_export.liste_demis, name='liste_demis'),
+    path('detaches/', views_export.liste_detaches, name='liste_detaches'),
+    path('licencies/', views_export.liste_licencies, name='liste_licencies'),
+    path('disponibles/', views_export.liste_disponibilites, name='liste_disponibilites'),
+    path('decedes/', views_export.liste_decedes, name='liste_decedes'),
+    path('responsables/', views_export.liste_responsables_par_entite, name='liste_responsables_par_entite'),
+    path('controleurs/', views_export.liste_controleurs, name='liste_controleurs'),
+]
