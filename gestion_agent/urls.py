@@ -6,6 +6,7 @@ from django.views.static import serve
 from personnel.views_dashboard import tableau_de_bord
 from django.contrib.auth import views as auth_views
 from personnel.views import accueil  # Vue d'accueil personnalisée
+from personnel import views
 
 urlpatterns = [
     # Accueil
