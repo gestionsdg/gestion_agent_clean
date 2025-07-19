@@ -298,14 +298,14 @@ def liste_actifs_par_entite_pdf(request):
                 ("Sous-Directeur GESOC", 10),
                 ("Sous-Directeur Pension Compl.", 11),
                 ("Sous-Directeur de Trésorerie", 12),
-                ("Sous-Directeur Log. et Maint.", 13)
-                ("Sous-Directeur des Appro", 14)
-                ("Sous-Directeur Juridique", 15)
-                ("Sous-Directeur Contentieux", 16)
-                ("Sous-Directeur de Grandes Entreprises", 17)
-                ("Sous-Directeur des Statistiques", 18)
-                ("Sous-Directeur du Contentieux", 19)
-                ("Sous-Directeur Pharmacie et Labo", 20)
+                ("Sous-Directeur Log. et Maint.", 13),
+                ("Sous-Directeur des Appro", 14),
+                ("Sous-Directeur Juridique", 15),
+                ("Sous-Directeur Contentieux", 16),
+                ("Sous-Directeur de Grandes Entreprises", 17),
+                ("Sous-Directeur des Statistiques", 18),
+                ("Sous-Directeur du Contentieux", 19),
+                ("Sous-Directeur Pharmacie et Labo", 20),
                 ("Sous-Directeur Technique", 21),
                 ("Sous-Directeur Adm. et Fin.", 22),
                 ("Sous-Directeur", 23),
