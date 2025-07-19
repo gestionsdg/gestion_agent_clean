@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
@@ -8,7 +7,7 @@
 </div>
 
 <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 40px;">
-  <a href="{% url 'liste_employes' %}">
+  <a href="/personnel/">
     <div class="card-dashboard" style="background-color: #007bff; color: white;">
       <div style="font-size: 60px;">👥</div>
       <div style="font-size: 18px; font-weight: bold;">Total Agents</div>
@@ -16,7 +15,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_actifs_entite' %}">
+  <a href="/filtre/actifs/">
     <div class="card-dashboard" style="background-color: #28a745; color: white;">
       <div style="font-size: 60px;">✅</div>
       <div style="font-size: 18px; font-weight: bold;">Agents Actifs</div>
@@ -24,7 +23,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_retraites_pdf' %}">
+  <a href="/pdf/retraites/pdf/">
     <div class="card-dashboard" style="background-color: #ffc107; color: black;">
       <div style="font-size: 60px;">👴</div>
       <div style="font-size: 18px; font-weight: bold;">Retraités</div>
@@ -32,7 +31,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_decedes_pdf' %}">
+  <a href="/pdf/decedes/pdf/">
     <div class="card-dashboard" style="background-color: #dc3545; color: white;">
       <div style="font-size: 60px;">⚰️</div>
       <div style="font-size: 18px; font-weight: bold;">Agents décédés</div>
@@ -40,7 +39,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_licencies_pdf' %}">
+  <a href="/pdf/licencies/pdf/">
     <div class="card-dashboard" style="background-color: #6c757d; color: white;">
       <div style="font-size: 60px;">❌</div>
       <div style="font-size: 18px; font-weight: bold;">Agents licenciés</div>
@@ -48,7 +47,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_demissionnaires_pdf' %}">
+  <a href="/pdf/demissionnaires/pdf/">
     <div class="card-dashboard" style="background-color: #17a2b8; color: white;">
       <div style="font-size: 60px;">📤</div>
       <div style="font-size: 18px; font-weight: bold;">Démissionnaires</div>
@@ -56,7 +55,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_detachement_pdf' %}">
+  <a href="/pdf/detachement/pdf/">
     <div class="card-dashboard" style="background-color: #20c997; color: white;">
       <div style="font-size: 60px;">🧳</div>
       <div style="font-size: 18px; font-weight: bold;">Agents en détachement</div>
@@ -64,7 +63,7 @@
     </div>
   </a>
 
-  <a href="{% url 'liste_disponibilite_pdf' %}">
+  <a href="/pdf/disponibilites/pdf/">
     <div class="card-dashboard" style="background-color: #6610f2; color: white;">
       <div style="font-size: 60px;">📂</div>
       <div style="font-size: 18px; font-weight: bold;">Mise en disponibilité</div>
@@ -74,7 +73,7 @@
 </div>
 
 <div style="text-align: center; margin-top: 30px;">
-  <a href="{% url 'liste_employes' %}">
+  <a href="/personnel/">
     <button class="btn btn-secondary">⬅ Retour à la liste des agents</button>
   </a>
   {% if is_admin_rh %}
