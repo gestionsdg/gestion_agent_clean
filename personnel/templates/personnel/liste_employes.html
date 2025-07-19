@@ -58,14 +58,14 @@
         {% if not lecture_seule %}
             <a href="{% url 'ajouter_employe' %}"><button style="background-color: green;">+ Ajouter un employé</button></a>
         {% endif %}
-        <a href="{% url 'liste_actifs_entite' %}"><button style="background-color: #007bff;">📄 Cadres et Agents actifs</button></a>
-        <a href="{% url 'liste_retraitables_pdf' %}" target="_blank"><button style="background-color: #d9534f; color: white;">📄 Cadres et Agents retraitables</button></a>
-		<a href="{% url 'liste_responsables_coordonnateurs' %}"><button style="background-color: #20B2AA;">🖌️Responsables de Service</button></a>
-		<a href="{% url 'liste_controleurs' %}"><button style="background-color: navy;">📋 Contrôleurs</button></a>
-		{% if request.user.groups.all.0.name == 'Administration RH' or request.user.is_superuser %}
+        {# <a href="{% url 'liste_actifs_entite' %}"><button style="background-color: #007bff;">📄 Cadres et Agents actifs</button></a> #}
+        {# <a href="{% url 'liste_retraitables_pdf' %}" target="_blank"><button style="background-color: #d9534f; color: white;">📄 Cadres et Agents retraitables</button></a> #}
+        {# <a href="{% url 'liste_responsables_coordonnateurs' %}"><button style="background-color: #20B2AA;">🖌️Responsables de Service</button></a> #}
+        {# <a href="{% url 'liste_controleurs' %}"><button style="background-color: navy;">📋 Contrôleurs</button></a> #}
+        {% if request.user.groups.all.0.name == 'Administration RH' or request.user.is_superuser %}
             <a href="{% url 'export_employes_excel_complet' %}"><button style="background-color: purple;">📤 Exporter Excel</button></a>
         {% endif %}
-    </div>   
+    </div>
     <div class="btn-group" style="margin-bottom: 10px;">
 		{% if request.user.groups.all.0.name == 'Administration RH' or request.user.is_superuser %}
 			<a href="/admin/"><button style="background-color: #000000;">🔙 Retour à l'administration</button></a>
