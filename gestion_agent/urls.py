@@ -5,7 +5,8 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from django.http import HttpResponse
 
-from personnel.views import accueil, liste_employes, ajouter_employe  # ✅ CORRIGÉ
+# Vues locales
+from personnel.views import accueil, liste_employes, ajouter_employe
 from personnel.views_dashboard import tableau_de_bord
 from django.contrib.auth import views as auth_views
 
@@ -14,21 +15,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('connexion/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='custom_login'),
-    path('dashboard/', tableau_de_bord, name='dashboard'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),  # ✅ utile en production
 
+    path('dashboard/', tableau_de_bord, name='dashboard'),
     path('employes/', liste_employes, name='liste_employes'),
-    path('employes/ajouter/', ajouter_employe, name='ajouter_employe'),  # ✅ AJOUTÉ
+    path('employes/ajouter/', ajouter_employe, name='ajouter_employe'),
 
     path('test/', lambda request: HttpResponse("OK"), name='test'),
+
+    # ✅ Inclusions de toutes les autres routes importantes
+    path('personnel/', include('personnel.urls_actifs')),  # Pour liste_actifs_entite et similaires
+    path('export/', include('personnel.urls_export')),      # Pour PDF/Excel d’export
+    path('pdf/', include('personnel.urls_pdf')),            # Pour fiches PDF individuelles
+    path('filtre/', include('personnel.urls_filtrage')),    # Pour liste retraitables, décédés, etc.
 ]
-
-# Fichiers médias (pour DEBUG = True)
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-]
-
-if not settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
