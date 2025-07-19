@@ -22,7 +22,7 @@ urlpatterns = [
     path('dashboard/', tableau_de_bord, name='dashboard'),
 
     # Inclusion des URLs de l'application personnel
-    path('employes/', include('personnel.urls')),
+    path('employes/', views.liste_employes, name='liste_employes')
 ]
 
 # Fichiers médias (pour DEBUG = True)
