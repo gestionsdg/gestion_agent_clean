@@ -14,6 +14,7 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      margin: 0;
     }
 
     .login-container {
@@ -21,15 +22,14 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      width: 350px;
+      width: 400px;
       text-align: center;
     }
 
     .logo {
-      max-height: 80px;
+      max-height: 100px;
       width: auto;
-      display: block;
-      margin: 0 auto 10px;
+      margin-bottom: 10px;
     }
 
     .logo-text {
@@ -38,12 +38,10 @@
       margin-bottom: 20px;
     }
 
-    input[type="text"],
-    input[type="password"] {
+    .form-control {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
@@ -53,8 +51,13 @@
       color: white;
       border: none;
       padding: 10px 20px;
-      cursor: pointer;
       border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3;
     }
 
     .error {
@@ -81,24 +84,22 @@
   <form method="post">
     {% csrf_token %}
     {{ form.username.label_tag }}
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-    
+    {% render_field form.username class="form-control" placeholder="Nom d’utilisateur" %}
+
     {{ form.password.label_tag }}
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    
+    {% render_field form.password class="form-control" placeholder="Mot de passe" %}
+
     <input type="submit" value="Connexion">
   </form>
 
   <div class="admin-link">
     {% if user.is_authenticated and user.is_superuser %}
-		<a href="/admin/" style="color: purple;">Accéder à l'interface Admin</a>
-	{% else %}
-		<span style="color: grey; cursor: not-allowed;" title="Accès réservé à l'Administrateur RH">Accéder à l'interface Admin</span>
-	{% endif %}
-
+      <a href="/admin/" style="color: purple;">Accéder à l'interface Admin</a>
+    {% else %}
+      <span style="color: grey; cursor: not-allowed;" title="Accès réservé à l'Administrateur RH">Accéder à l'interface Admin</span>
+    {% endif %}
   </div>
 </div>
 
 </body>
 </html>
-

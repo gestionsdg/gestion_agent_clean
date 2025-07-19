@@ -15,7 +15,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('connexion/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='custom_login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),  # ✅ utile en production
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     path('dashboard/', tableau_de_bord, name='dashboard'),
     path('employes/', liste_employes, name='liste_employes'),
@@ -23,9 +23,11 @@ urlpatterns = [
 
     path('test/', lambda request: HttpResponse("OK"), name='test'),
 
-    # ✅ Inclusions de toutes les autres routes importantes
-    path('personnel/', include('personnel.urls_actifs')),  # Pour liste_actifs_entite et similaires
-    path('export/', include('personnel.urls_export')),      # Pour PDF/Excel d’export
-    path('pdf/', include('personnel.urls_pdf')),            # Pour fiches PDF individuelles
-    path('filtre/', include('personnel.urls_filtrage')),    # Pour liste retraitables, décédés, etc.
+    # ✅ Nouveau pour rendre /personnel/ accessible
+    path('personnel/', accueil, name='personnel_accueil'),
+    path('personnel/actifs/', include('personnel.urls_actifs')),
+
+    path('export/', include('personnel.urls_export')),
+    path('pdf/', include('personnel.urls_pdf')),
+    path('filtre/', include('personnel.urls_filtrage')),
 ]

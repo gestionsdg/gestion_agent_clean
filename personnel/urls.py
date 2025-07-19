@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views  # ✅ Ajouté pour la connexion
 from . import views, views_export, views_pdf_weasyprint
 from .views import (
     liste_employes, ajouter_employe, modifier_employe, logout_view
@@ -79,4 +80,7 @@ urlpatterns = [
 
     # Déconnexion
     path('logout/', logout_view, name='logout'),
+
+    # ✅ Connexion
+    path('connexion/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
 ]
