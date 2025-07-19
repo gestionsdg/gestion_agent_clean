@@ -3,6 +3,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from django.http import HttpResponse  # ✅ Import ajouté pour la route de test
 
 from personnel.views import accueil, liste_employes  # ✅ Import direct
 from personnel.views_dashboard import tableau_de_bord
@@ -23,7 +24,10 @@ urlpatterns = [
     path('dashboard/', tableau_de_bord, name='dashboard'),
 
     # Inclusion des URLs de l'application personnel
-    path('employes/', liste_employes, name='liste_employes'),  # ✅ Correction ici
+    path('employes/', liste_employes, name='liste_employes'),
+
+    # ✅ Route de test
+    path('test/', lambda request: HttpResponse("OK"), name='test'),
 ]
 
 # Fichiers médias (pour DEBUG = True)
@@ -38,5 +42,3 @@ urlpatterns += [
 # Fichiers statiques (en production)
 if not settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
-    path('test/', lambda request: HttpResponse("OK"), name='test'),
