@@ -14,3 +14,4 @@ services:
         generateValue: true
       - key: ALLOWED_HOSTS
         value: gestion-agent.onrender.com
+
