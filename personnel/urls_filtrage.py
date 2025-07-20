@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views_export  # ou le fichier où sont vos vues
+from personnel import views_export
 
 urlpatterns = [
     path('retraitables/', views_export.liste_retraites, name='liste_retraites'),
