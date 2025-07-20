@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 # Vues locales
 from personnel.views import accueil, liste_employes, ajouter_employe
@@ -11,7 +12,13 @@ from personnel.views_dashboard import tableau_de_bord
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', accueil, name='accueil'),
+def redirection_accueil(request):
+    if request.user.is_authenticated:
+        return redirect('accueil')  # vue accueil déjà existante
+    else:
+        return redirect('login')  # renvoie vers /connexion/
+
+    path('', redirection_accueil, name='redirection_accueil'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('connexion/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='custom_login'),

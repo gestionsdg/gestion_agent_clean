@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
 # 🔄 Vue pour rediriger depuis l’admin vers la liste des employés
 @login_required
@@ -107,5 +108,6 @@ def modifier_employe(request, pk):
 
     return render(request, 'personnel/modifier_employe.html', {'form': form, 'employe': employe})
 
+@login_required(login_url='/connexion/')
 def accueil(request):
     return render(request, 'accueil.html')
