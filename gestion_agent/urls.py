@@ -11,13 +11,14 @@ from personnel.views import accueil, liste_employes, ajouter_employe
 from personnel.views_dashboard import tableau_de_bord
 from django.contrib.auth import views as auth_views
 
-urlpatterns = [
+# ✅ La fonction doit être définie AVANT urlpatterns
 def redirection_accueil(request):
     if request.user.is_authenticated:
-        return redirect('accueil')  # vue accueil déjà existante
+        return redirect('accueil')
     else:
-        return redirect('login')  # renvoie vers /connexion/
+        return redirect('login')
 
+urlpatterns = [
     path('', redirection_accueil, name='redirection_accueil'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
@@ -30,10 +31,8 @@ def redirection_accueil(request):
 
     path('test/', lambda request: HttpResponse("OK"), name='test'),
 
-    # ✅ Nouveau pour rendre /personnel/ accessible
     path('personnel/', accueil, name='personnel_accueil'),
     path('personnel/actifs/', include('personnel.urls_actifs')),
-
     path('export/', include('personnel.urls_export')),
     path('pdf/', include('personnel.urls_pdf')),
     path('filtre/', include('personnel.urls_filtrage')),
