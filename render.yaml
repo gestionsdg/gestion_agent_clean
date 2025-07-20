@@ -1,15 +1,16 @@
 services:
   - type: web
-    name: gestion-agent
+    name: gestion_agent
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn gestion_agent.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: gestion_agent.settings
       - key: PYTHON_VERSION
-        value: 3.10
+        value: 3.13.4
       - key: SECRET_KEY
         generateValue: true
-      - key: DEBUG
-        value: False
+      - key: ALLOWED_HOSTS
+        value: gestion-agent.onrender.com
