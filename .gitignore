@@ -1,2 +1,23 @@
-# Ignorer le dossier de l’environnement virtuel
+# --- Environnements virtuels ---
 env/
+venv/
+
+# --- Fichiers Python compilés ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Base de données locale ---
+db.sqlite3
+
+# --- Dossiers de fichiers statiques collectés ---
+/staticfiles/
+
+# --- Fichiers système et temporaires ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- Fichiers de configuration locaux (si existants) ---
+.env
+
