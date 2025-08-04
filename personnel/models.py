@@ -174,6 +174,8 @@ class Employe(models.Model):
 
     statut = models.CharField(max_length=100, choices=STATUT_CHOICES, null=True, blank=True)
     date_statut = models.DateField(null=True, blank=True)
+    date_fin_disponibilite = models.DateField(null=True, blank=True)
+    date_fin_detachement = models.DateField(null=True, blank=True)
 
     telephone1 = models.CharField(max_length=20, null=True, blank=True)
     telephone2 = models.CharField(max_length=20, null=True, blank=True)

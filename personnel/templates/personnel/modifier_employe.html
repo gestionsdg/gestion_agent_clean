@@ -61,27 +61,33 @@
         <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
     </div>
 
-    <h2>Modifier l'Employé : {{ employe.nom|default:"-" }} {{ employe.prenom|default:"-" }}</h2>
+    {% if perms.personnel.change_employe %}
+        <h2>Modifier l'Employé : {{ employe.nom|default:"-" }} {{ employe.prenom|default:"-" }}</h2>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        {% if employe.photo %}
-            <div class="photo-preview">
-                <img src="{{ employe.photo.url }}" alt="Photo de l'employé">
-            </div>
-        {% endif %}
-
-        {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.value == "nan" or field.value == "" %}
-                <p style="color: gray;">Valeur actuelle : -</p>
-            {% else %}
-                <p style="color: gray;">Valeur actuelle : {{ field.value }}</p>
+            {% if employe.photo %}
+                <div class="photo-preview">
+                    <img src="{{ employe.photo.url }}" alt="Photo de l'employé">
+                </div>
             {% endif %}
-        {% endfor %}
-        <button type="submit">Mettre à jour</button>
-    </form>
+
+            {% for field in form %}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.value == "nan" or field.value == "" %}
+                    <p style="color: gray;">Valeur actuelle : -</p>
+                {% else %}
+                    <p style="color: gray;">Valeur actuelle : {{ field.value }}</p>
+                {% endif %}
+            {% endfor %}
+            <button type="submit">Mettre à jour</button>
+        </form>
+    {% else %}
+        <div style="text-align:center; color:red; font-size:18px;">
+            ⛔ Vous n’avez pas la permission de modifier cet employé.
+        </div>
+    {% endif %}
 </body>
 </html>

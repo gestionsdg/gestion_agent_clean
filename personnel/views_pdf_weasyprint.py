@@ -10,8 +10,13 @@ from .models import Employe
 from django.http import HttpResponse
 from collections import defaultdict
 from weasyprint import HTML, CSS  # ✅ Assurez-vous que cette ligne est bien présente
-from .utils import calcul_duree, format_duree  # Assurez-vous que ces fonctions sont bien définies
+from .utils import calcul_duree_detaillee, format_duree  # Assurez-vous que ces fonctions sont bien définies
 from django.utils.timezone import now
+from django.template.loader import get_template
+import tempfile
+from io import BytesIO  # en haut de votre fichier
+from django.db.models import Count
+from django.shortcuts import render
 
 ordre_fonctions = [
     "Coordonnateur",
@@ -35,33 +40,22 @@ def calcul_age(date_naissance):
         return age
     return None
 
-def calcul_duree(depuis):
-    if depuis:
-        today = date.today()
-        delta = today.year - depuis.year - ((today.month, today.day) < (depuis.month, depuis.day))
-        return delta
-    return None
-
-def format_duree(value):
-    return f"{value} an{'s' if value > 1 else ''}" if value is not None else "-"
-
-
 def fiche_employe_pdf(request, pk):
     employe = get_object_or_404(Employe, pk=pk)
 
-    age = calcul_duree(employe.date_naissance)
-    anciennete_societe = calcul_duree(employe.date_engagement)
-    anciennete_grade = calcul_duree(employe.date_derniere_promotion)
-    duree_affectation = calcul_duree(employe.date_affectation)
-    duree_prise_fonction = calcul_duree(employe.date_prise_fonction)
+    age = format_duree(calcul_duree_detaillee(employe.date_naissance))
+    anciennete_societe = format_duree(calcul_duree_detaillee(employe.date_engagement))
+    anciennete_grade = format_duree(calcul_duree_detaillee(employe.date_derniere_promotion))
+    duree_affectation = format_duree(calcul_duree_detaillee(employe.date_affectation))
+    duree_prise_fonction = format_duree(calcul_duree_detaillee(employe.date_prise_fonction))
 
     context = {
         'employe': employe,
-        'age': format_duree(age),
-        'anciennete_societe': format_duree(anciennete_societe),
-        'anciennete_grade': format_duree(anciennete_grade),
-        'duree_affectation': format_duree(duree_affectation),
-        'duree_prise_fonction': format_duree(duree_prise_fonction),
+        'age': format_duree(calcul_duree_detaillee(employe.date_naissance)),
+        'anciennete_societe': format_duree(calcul_duree_detaillee(employe.date_engagement)),
+        'anciennete_grade': format_duree(calcul_duree_detaillee(employe.date_derniere_promotion)),
+        'duree_affectation': format_duree(calcul_duree_detaillee(employe.date_affectation)),
+        'duree_prise_fonction': format_duree(calcul_duree_detaillee(employe.date_prise_fonction)),
         'date_impression': DateFormat(date.today()).format('d/m/Y'),
     }
 
@@ -82,13 +76,10 @@ def liste_responsables_par_entite_pdf(request):
 
     donnees = []
     for idx, emp in enumerate(agents, 1):
+        # Durée avec format détaillé (ans/mois/jours)
         duree = "-"
         if emp.date_affectation:
-            today = date.today()
-            delta = today.year - emp.date_affectation.year
-            if (today.month, today.day) < (emp.date_affectation.month, emp.date_affectation.day):
-                delta -= 1
-            duree = f"{delta} an{'s' if delta > 1 else ''}"
+            duree = format_duree(calcul_duree_detaillee(emp.date_affectation))
 
         donnees.append([
             idx,
@@ -112,7 +103,7 @@ def liste_responsables_par_entite_pdf(request):
     response['Content-Disposition'] = f'inline; filename=responsables_{entite or "tous"}.pdf'
     HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(response)
     return response
-    
+
 def liste_controleurs_pdf(request):
     entite = request.GET.get('entite')
     if entite:
@@ -146,7 +137,7 @@ def liste_controleurs_pdf(request):
     donnees = []
     for idx, emp in enumerate(agents, 1):
         age = calcul_age(emp.date_naissance)
-        duree_aff = calcul_duree(emp.date_affectation)
+        duree_aff = format_duree(calcul_duree_detaillee(emp.date_affectation))
         donnees.append([
             idx,
             emp.nom or '-',
@@ -193,14 +184,9 @@ def liste_responsables_coordonnateurs_pdf(request):
     ]
 
     if entite:
-        agents = Employe.objects.filter(
-            fonction__in=["Responsable", "Responsable a.i", "Coordonnateur", "Coordonnateur a.i"],
-            entite=entite
-        )
+        agents = Employe.objects.filter(fonction__in=["Responsable", "Responsable a.i", "Coordonnateur", "Coordonnateur a.i"], entite=entite)
     else:
-        agents = Employe.objects.filter(
-            fonction__in=["Responsable", "Responsable a.i", "Coordonnateur", "Coordonnateur a.i"]
-        )
+        agents = Employe.objects.filter(fonction__in=["Responsable", "Responsable a.i", "Coordonnateur", "Coordonnateur a.i"])
 
     agents = sorted(
         agents,
@@ -212,15 +198,6 @@ def liste_responsables_coordonnateurs_pdf(request):
 
     donnees = []
     for i, agent in enumerate(agents, start=1):
-        if agent.date_affectation:
-            nb_ans = calcul_duree(agent.date_affectation)
-            if nb_ans <= 1:
-                duree_str = f"{nb_ans} an"
-            else:
-                duree_str = f"{nb_ans} ans"
-        else:
-            duree_str = "-"
-        
         donnees.append([
             i,
             agent.nom or "",
@@ -230,7 +207,7 @@ def liste_responsables_coordonnateurs_pdf(request):
             agent.service or "",
             agent.fonction or "",
             agent.date_affectation.strftime("%d/%m/%Y") if agent.date_affectation else "-",
-            duree_str
+            format_duree(calcul_duree_detaillee(agent.date_affectation))
         ])
 
     html_string = render_to_string("personnel/liste_responsables_coordonnateurs_pdf.html", {
@@ -249,6 +226,7 @@ def liste_responsables_coordonnateurs_pdf(request):
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { border: 1px solid black; padding: 5px; text-align: center; }
     ''')
+
     HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(response, stylesheets=[css])
     return response
     
@@ -330,7 +308,7 @@ def liste_actifs_par_entite_pdf(request):
                 
                 emp.fonction or "-",
                 emp.date_affectation.strftime("%d/%m/%Y") if emp.date_affectation else "-",
-                format_duree(calcul_duree(emp.date_affectation)),
+                format_duree(calcul_duree_detaillee(emp.date_affectation)),
             ])
 
         # Trier les agents
@@ -369,7 +347,7 @@ def liste_actifs_par_entite_pdf(request):
                 emp.grade_actuel or "-",
                 emp.fonction or "-",
                 emp.date_affectation.strftime("%d/%m/%Y") if emp.date_affectation else "-",
-                format_duree(calcul_duree(emp.date_affectation)),
+                format_duree(calcul_duree_detaillee(emp.date_affectation)),
             ])
 
         donnees_groupes.append((service, lignes_cadres, lignes_agents))
@@ -463,15 +441,21 @@ def liste_cadres_direction_pdf(request):
     lignes = []
     for i, agent in enumerate(cadres, start=1):
         age = calcul_age(agent.date_naissance)
+
+        # Utilisation du format détaillé (ans, mois, jours)
+        duree_affectation = "-"
+        if agent.date_affectation:
+            duree_affectation = format_duree(calcul_duree_detaillee(agent.date_affectation))
+
         lignes.append((
             i,
-            agent.nom,
-            agent.matricule,
-            agent.grade_actuel,
-            agent.sexe,
-            agent.fonction,
+            agent.nom or "-",
+            agent.matricule or "-",
+            agent.grade_actuel or "-",
+            agent.sexe or "-",
+            agent.fonction or "-",
             agent.date_affectation.strftime('%d/%m/%Y') if agent.date_affectation else '-',
-            calcul_duree_texte(agent.date_affectation),
+            duree_affectation,
             format_age(age)
         ))
 
@@ -548,110 +532,115 @@ def liste_retraitables_pdf(request):
     html.write_pdf(response, stylesheets=[css])
     return response
 
-def liste_detaches_pdf(request):
-    agents = Employe.objects.filter(statut="Détaché").order_by("nom")
-
+def liste_detachement_pdf(request):
+    agents = Employe.objects.filter(statut='En détachement').order_by('nom')
     donnees = []
-    for i, emp in enumerate(agents, start=1):
+
+    for idx, emp in enumerate(agents, 1):
+        # Début détachement = date_statut
+        date_debut = emp.date_statut
+        date_fin = getattr(emp, 'date_fin_detachement', None)
+
+        # Calcul durée entre début et fin détachement
+        if date_fin:
+            duree = format_duree(calcul_duree_detaillee(date_debut, date_fin))
+        else:
+            duree = "-"
+
         donnees.append([
-            i,
-            emp.nom or "-",
-            emp.matricule or "-",
-            emp.grade_actuel or "-",
-            emp.sexe or "-",
-            emp.fonction or "-",
-            emp.date_affectation.strftime("%d/%m/%Y") if emp.date_affectation else "-",
-            format_duree(calcul_duree(emp.date_affectation)),
-            emp.entite or "-"
+            idx,
+            emp.nom or '-',
+            emp.matricule or '-',
+            emp.grade_actuel or '-',
+            emp.sexe or '-',
+            emp.date_statut.strftime('%d/%m/%Y') if emp.date_statut else '-',
+            date_fin.strftime('%d/%m/%Y') if date_fin else '-',
+            duree,
+            emp.entite or '-'
         ])
 
-    html_string = render_to_string("personnel/liste_detaches.html", {
+    html_string = render_to_string("personnel/liste_detachement_pdf.html", {
         "titre": "Liste des agents en détachement",
-        "colonnes": ["N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Fonction", "Date affectation", "Durée affectation", "Entité"],
-        "donnees": donnees,
+        "colonnes": [
+            "N°", "Nom", "Matricule", "Grade actuel", "Sexe",
+            "Date détachement", "Date fin détachement", "Durée", "Entité"
+        ],
+        "donnees": donnees
     })
 
-    css = CSS(string="""
-        @page { size: A4 landscape; margin: 1cm; }
-        h2 { text-align: center; text-decoration: underline; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 6px;
-            text-align: center;
-        }
-        th.left, td.left {
-            text-align: left;
-        }
-    """)
-
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = "inline; filename=liste_detaches.pdf"
-    HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(response, stylesheets=[css])
+    response["Content-Disposition"] = "inline; filename=liste_detachement.pdf"
+    HTML(string=html_string).write_pdf(response, stylesheets=[CSS(string="@page { size: landscape; }")])
     return response
 
-def calcul_duree(depuis):
-    if depuis:
-        today = date.today()
-        return today.year - depuis.year - ((today.month, today.day) < (depuis.month, depuis.day))
-    return None
+
+# --- Correction ajoutée ici ---
+def nettoyer_unite_ans(texte):
+    """
+    Supprime les doublons 'ans ans' ou 'an ans' dans les chaînes générées
+    par format_duree().
+    """
+    if not texte:
+        return "-"
+    return texte.replace(" ans ans", " ans").replace(" an ans", " an").replace(" an an", " an")
+# --------------------------------
+
+# ... (tout le reste de ton fichier inchangé jusqu'à la fonction liste_licencies_pdf)
 
 def liste_licencies_pdf(request):
+    # Récupérer tous les agents licenciés
     agents = Employe.objects.filter(statut="Licencié").order_by("nom")
+
     donnees = []
     for i, agent in enumerate(agents, start=1):
-        donnee = [
-            i,
-            agent.nom,
-            agent.matricule,
-            agent.grade_actuel,
-            agent.sexe,
-            agent.date_engagement,
-            agent.date_statut,
-            calcul_duree(agent.date_engagement),
-            agent.entite
-        ]
-        donnees.append(donnee)
+        # Calcul de la carrière avec suppression du double "ans"
+        carriere = format_duree(calcul_duree_detaillee(agent.date_engagement, agent.date_statut)) \
+            .replace(" ans ans", " ans") \
+            .replace(" an ans", " an")
 
+        donnees.append([
+            i,
+            agent.nom or "-",
+            agent.matricule or "-",
+            agent.grade_actuel or "-",
+            agent.sexe or "-",
+            agent.date_engagement.strftime("%d/%m/%Y") if agent.date_engagement else "-",
+            agent.date_statut.strftime("%d/%m/%Y") if agent.date_statut else "-",
+            carriere,
+            agent.entite or "-"
+        ])
+
+    # Rendu du template PDF
     html_string = render_to_string("personnel/liste_licencies_pdf.html", {
         "titre": "Liste des Agents Licenciés",
         "colonnes": ["N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Date engagement", "Date licenciement", "Carrière", "Entité"],
         "donnees": donnees,
     })
 
+    # Génération du PDF
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     css = CSS(string='@page { size: landscape; }')
     pdf = html.write_pdf(stylesheets=[css])
-    return HttpResponse(pdf, content_type='application/pdf')
 
-def calcul_duree(depuis):
-    if depuis:
-        today = date.today()
-        return today.year - depuis.year - ((today.month, today.day) < (depuis.month, depuis.day))
-    return None
+    return HttpResponse(pdf, content_type='application/pdf')
 
 def liste_disponibilite_pdf(request):
     agents = Employe.objects.filter(statut="Mise en disponibilité").order_by('nom')
     donnees = {}
     for i, agent in enumerate(agents, start=1):
+        # Calcul détaillé avec format correct (an/ans, mois, jours)
+        duree = "-"
         if agent.date_statut:
-            today = date.today()
-            delta = today.year - agent.date_statut.year - ((today.month, today.day) < (agent.date_statut.month, agent.date_statut.day))
-        else:
-            delta = None
+           duree = format_duree(calcul_duree_detaillee(agent.date_statut)).replace(" an an", " an").replace(" ans an", " ans")
+
         donnees[i] = {
-            'nom': agent.nom,
-            'matricule': agent.matricule,
-            'grade': agent.grade_actuel,
-            'sexe': agent.sexe,
+            'nom': agent.nom or "-",
+            'matricule': agent.matricule or "-",
+            'grade': agent.grade_actuel or "-",
+            'sexe': agent.sexe or "-",
             'date_dispo': agent.date_statut.strftime('%d/%m/%Y') if agent.date_statut else "-",
-            'duree': delta,
-            'entite': agent.entite
+            'duree': duree,  # Utilisation du format complet
+            'entite': agent.entite or "-"
         }
 
     html_string = render_to_string("personnel/liste_disponibilite_pdf.html", {
@@ -664,15 +653,6 @@ def liste_disponibilite_pdf(request):
 
     return HttpResponse(pdf_file, content_type='application/pdf')
     
-def calcul_duree(depuis):
-    if depuis:
-        today = date.today()
-        return today.year - depuis.year - ((today.month, today.day) < (depuis.month, depuis.day))
-    return None
-
-def format_duree(value):
-    return f"{value} an{'s' if value > 1 else ''}" if value is not None else "-"
-
 def liste_retraites_pdf(request):
     agents = Employe.objects.filter(statut='Mise à la retraite').order_by('nom')
     
@@ -736,17 +716,20 @@ def liste_retraites_pdf(request):
     HTML(string=html_string).write_pdf(response, stylesheets=[css])
     return response
 
-
 def liste_detachement_pdf(request):
     agents = Employe.objects.filter(statut='En détachement').order_by('nom')
     donnees = []
-    for idx, emp in enumerate(agents, 1):
-        duree = "-"
-        if emp.date_statut:
-            duree = format_duree(calcul_duree(emp.date_statut))
 
-        fonction = str(emp.fonction).strip() if emp.fonction else ''
-        fonction = fonction if fonction.lower() != 'nan' and fonction != '' else '-'
+    for idx, emp in enumerate(agents, 1):
+        # Date début (détachement)
+        date_debut = emp.date_statut
+        # Nouvelle date fin détachement (doit exister dans le modèle)
+        date_fin = getattr(emp, 'date_fin_detachement', None)
+
+        # Calcul durée uniquement si date_fin existe
+        duree = "-"
+        if date_debut and date_fin:
+            duree = format_duree(calcul_duree_detaillee(date_debut, date_fin))
 
         donnees.append([
             idx,
@@ -754,15 +737,18 @@ def liste_detachement_pdf(request):
             emp.matricule or '-',
             emp.grade_actuel or '-',
             emp.sexe or '-',
-            fonction,
-            emp.date_statut.strftime('%d/%m/%Y') if emp.date_statut else '-',
+            date_debut.strftime('%d/%m/%Y') if date_debut else '-',
+            date_fin.strftime('%d/%m/%Y') if date_fin else '-',
             duree,
             emp.entite or '-'
         ])
 
     html_string = render_to_string("personnel/liste_detachement_pdf.html", {
         "titre": "Liste des agents en détachement",
-        "colonnes": ["N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Fonction", "Date détachement", "Durée", "Entité"],
+        "colonnes": [
+            "N°", "Nom", "Matricule", "Grade actuel", "Sexe",
+            "Date détachement", "Date fin détachement", "Durée", "Entité"
+        ],
         "donnees": donnees
     })
 
@@ -771,40 +757,35 @@ def liste_detachement_pdf(request):
     HTML(string=html_string).write_pdf(response, stylesheets=[CSS(string="@page { size: landscape; }")])
     return response
 
+def calcul_age_deces(date_naissance, date_deces=None):
+    if not date_naissance:
+        return "-"
+    
+    # Si la date de décès est vide, utiliser la date actuelle
+    date_fin = date_deces if date_deces else date.today()
 
-def liste_demissionnaires_pdf(request):
-    agents = Employe.objects.filter(statut='Démission').order_by('nom')
-    donnees = []
-    for idx, emp in enumerate(agents, 1):
-        duree = "-"
-        if emp.date_engagement and emp.date_statut:
-            duree = format_duree(calcul_duree(emp.date_engagement))
-        donnees.append([
-            idx,
-            emp.nom or '-',
-            emp.matricule or '-',
-            emp.grade_actuel or '-',
-            emp.sexe or '-',
-            emp.date_engagement.strftime('%d/%m/%Y') if emp.date_engagement else '-',
-            emp.date_statut.strftime('%d/%m/%Y') if emp.date_statut else '-',
-            duree,
-            emp.entite or '-'
-        ])
-    html_string = render_to_string("personnel/liste_demissionnaires_pdf.html", {
-        "titre": "Liste des agents démissionnaires",
-        "colonnes": ["N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Date engagement", "Date démission", "Carrière", "Entité"],
-        "donnees": donnees
-    })
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = "inline; filename=liste_demissionnaires.pdf"
-    HTML(string=html_string).write_pdf(response, stylesheets=[CSS(string="@page { size: landscape; }")])
-    return response
+    # Calcul en jours
+    jours_total = (date_fin - date_naissance).days
+
+    if jours_total < 30:
+        return f"{jours_total} jours"
+    elif jours_total < 365:
+        mois = jours_total // 30
+        return f"{mois} mois"
+    else:
+        ans = jours_total // 365
+        return f"{ans} an{'s' if ans > 1 else ''}"
 
 def liste_decedes_pdf(request):
     agents = Employe.objects.filter(statut="Décédé").order_by("nom")
 
     donnees = []
     for i, emp in enumerate(agents, start=1):
+        # Calcul âge décédé
+        age_deces = "-"
+        if emp.date_naissance:
+            age_deces = calcul_age_deces(emp.date_naissance, emp.date_statut)
+
         donnees.append([
             i,
             emp.nom or "-",
@@ -812,16 +793,18 @@ def liste_decedes_pdf(request):
             emp.sexe or "-",
             emp.date_naissance.strftime("%d/%m/%Y") if emp.date_naissance else "-",
             emp.date_statut.strftime("%d/%m/%Y") if emp.date_statut else "-",
+            age_deces,
             emp.entite or "-"
         ])
 
     html_string = render_to_string("personnel/liste_decedes_pdf.html", {
         "titre": "Liste des agents décédés",
-        "colonnes": ["N°", "Nom", "Matricule", "Sexe", "Date de naissance", "Date décès", "Entité"],
+        "colonnes": ["N°", "Nom", "Matricule", "Sexe", "Date de naissance", "Date décès", "Âge décédé", "Entité"],
         "donnees": donnees,
         "today": now()
     })
 
+    # Ajout de classes pour gérer l'alignement
     css = CSS(string="""
         @page { size: A4 landscape; margin: 1cm; }
         h2 {
@@ -849,6 +832,12 @@ def liste_decedes_pdf(request):
         td.left {
             text-align: left;
         }
+        td.age {
+            text-align: center;
+        }
+        td.entite {
+            text-align: left;
+        }
     """)
 
     response = HttpResponse(content_type="application/pdf")
@@ -862,10 +851,8 @@ def liste_demissionnaires_pdf(request):
     for emp in agents:
         emp.carriere = "-"
         if emp.date_engagement and emp.date_statut:
-            duree = emp.date_statut.year - emp.date_engagement.year - (
-                (emp.date_statut.month, emp.date_statut.day) < (emp.date_engagement.month, emp.date_statut.day)
-            )
-            emp.carriere = f"{duree} an" if duree == 1 else f"{duree} ans"
+            # Utilisation du calcul détaillé avec ans/mois/jours
+            emp.carriere = format_duree(calcul_duree_detaillee(emp.date_engagement, emp.date_statut))
 
     agents = list(enumerate(agents, start=1))
     
@@ -878,3 +865,280 @@ def liste_demissionnaires_pdf(request):
     css = CSS(string='@page { size: A4 landscape; margin: 1cm; }')
     HTML(string=html_string).write_pdf(response, stylesheets=[css])
     return response
+    
+def liste_total_agents_pdf(request):
+    # Récupérer tous les employés
+    employes = Employe.objects.all().order_by('nom')
+
+    # Charger le template
+    template = get_template("liste_total_agents_pdf.html")
+    html_content = template.render({
+        "employes": employes,
+    })
+
+    # CSS pour format paysage
+    css = CSS(string='''
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        h1 {
+            text-align: center;
+            text-decoration: underline;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #d0e7f9;
+        }
+        td.col-nom, td.col-fonction, td.col-entite {
+            text-align: left;
+        }
+    ''')
+
+    # Générer PDF en mémoire (pas de fichier temporaire Windows)
+    pdf_file = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_file, stylesheets=[css])
+    pdf_file.seek(0)
+
+    # Réponse HTTP
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="liste_total_agents.pdf"'
+    return response
+ 
+def liste_effectif_par_entite_pdf(request):
+    # Récupération de l'effectif par entité trié par effectif croissant
+    effectifs = (
+        Employe.objects.values('entite')
+        .annotate(total=Count('id'))
+        .order_by('total')  # Tri croissant par nombre d'agents
+    )
+
+    # Calcul du total général
+    total_general = sum(item['total'] for item in effectifs)
+
+    # Préparer les données numérotées
+    donnees = []
+    for i, item in enumerate(effectifs, start=1):
+        donnees.append({
+            'numero': i,
+            'entite': item['entite'] or "-",
+            'effectif': item['total']
+        })
+
+    # Rendu du template PDF
+    html_string = render_to_string(
+        "personnel/liste_effectif_par_entite_pdf.html",
+        {"donnees": donnees, "total_general": total_general}
+    )
+
+    # Génération du PDF en mode portrait
+    html = HTML(string=html_string)
+    result = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; margin: 1cm }')])
+
+    # Réponse HTTP avec le PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="effectif_par_entite.pdf"'
+    response.write(result)
+    return response
+
+def liste_effectif_par_grade_pdf(request):
+    ordre_grades = [
+        "Directeur", "Sous-Directeur", "Chef de Division", "Chef de Sce Ppal",
+        "Chef de Service", "Chef de Sce Adjt", "Chef de Section", "Rédacteur Ppal",
+        "Rédacteur", "Rédacteur Adjt", "Commis Chef", "Commis Ppal", "Commis",
+        "Commis Adjt", "Agent Aux 1ère Cl", "Agent Aux 2è Cl", "Manœuvre Sp",
+        "Manœuvre Lourd", "Manœuvre Ord"
+    ]
+
+    effectifs = (
+        Employe.objects.values('grade_actuel')
+        .annotate(total=Count('id'))
+    )
+
+    effectifs_dict = {item['grade_actuel']: item['total'] for item in effectifs}
+
+    donnees = []
+    compteur = 1
+    for grade in ordre_grades:
+        if grade in effectifs_dict:
+            donnees.append({
+                'numero': compteur,
+                'grade': grade,
+                'effectif': effectifs_dict[grade]
+            })
+            compteur += 1
+
+    total_general = sum(effectifs_dict.values())
+
+    html_string = render_to_string(
+        "personnel/liste_effectif_par_grade_pdf.html",
+        {"donnees": donnees, "total_general": total_general}
+    )
+
+    html = HTML(string=html_string)
+    result = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; margin: 1cm }')])
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="effectif_par_grade.pdf"'
+    response.write(result)
+    return response
+ 
+def liste_agents_ayant_ete_licencies_pdf(request):
+    agents = Employe.objects.filter(statut="Licencié").order_by("nom")
+
+    donnees = {}
+    for i, agent in enumerate(agents, start=1):
+        # Calcul de la carrière (durée entre date engagement et date licenciement)
+        carriere = "-"
+        if agent.date_engagement and agent.date_statut:
+            carriere = format_duree(calcul_duree_detaillee(agent.date_engagement, agent.date_statut))
+
+        donnees[i] = {
+            "nom": agent.nom or "-",
+            "matricule": agent.matricule or "-",
+            "grade": agent.grade_actuel or "-",
+            "sexe": agent.sexe or "-",
+            "date_engagement": agent.date_engagement.strftime("%d/%m/%Y") if agent.date_engagement else "-",
+            "date_statut": agent.date_statut.strftime("%d/%m/%Y") if agent.date_statut else "-",
+            "carriere": carriere,
+            "entite": agent.entite or "-",
+        }
+
+    html_string = render_to_string("personnel/liste_agents_ayant_ete_licencies_pdf.html", {"donnees": donnees})
+    html = HTML(string=html_string)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; margin: 1cm; }')])
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = 'inline; filename="agents_ayant_ete_licencies.pdf"'
+    return response
+ 
+def liste_agents_mis_en_disponibilite_pdf(request):
+    agents = Employe.objects.filter(statut="Mise en disponibilité").order_by("nom")
+
+    donnees = {}
+    for i, agent in enumerate(agents, start=1):
+        # Dates
+        date_dispo = agent.date_statut
+        date_fin_dispo = agent.date_fin_disponibilite  # Assure-toi que ce champ existe dans ton modèle
+        duree = "-"
+
+        # Calcul de la durée si la date fin est présente
+        if date_dispo and date_fin_dispo:
+            duree = format_duree(calcul_duree_detaillee(date_dispo, date_fin_dispo))
+        elif not date_fin_dispo:
+            # Si date fin vide → durée et date fin affichent "-"
+            date_fin_dispo = None
+            duree = "-"
+
+        donnees[i] = {
+            "nom": agent.nom or "-",
+            "matricule": agent.matricule or "-",
+            "grade": agent.grade_actuel or "-",
+            "sexe": agent.sexe or "-",
+            "date_dispo": date_dispo.strftime("%d/%m/%Y") if date_dispo else "-",
+            "date_fin_dispo": date_fin_dispo.strftime("%d/%m/%Y") if date_fin_dispo else "-",
+            "duree": duree,
+            "entite": agent.entite or "-",
+        }
+
+    html_string = render_to_string("personnel/liste_agents_mis_en_disponibilite_pdf.html", {"donnees": donnees})
+
+    # PDF paysage
+    html = HTML(string=html_string)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; margin: 1cm; }')])
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = 'inline; filename="agents_mis_en_disponibilite.pdf"'
+    return response
+
+from collections import defaultdict
+from django.db.models import Count
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+
+def effectif_detaille_par_grade(request):
+    GRADES_ORDONNES = [
+        "Directeur", "Sous-Directeur", "Chef de Division", "Chef de Sce Ppal", "Chef de Service",
+        "Chef de Sce Adjt", "Chef de Section", "Rédacteur Ppal", "Rédacteur", "Rédacteur Adjt",
+        "Commis Chef", "Commis Ppal", "Commis", "Commis Adjt", "Agent Aux 1ère Cl",
+        "Agent Aux 2è Cl", "Manœuvre Sp", "Manœuvre Lourd", "Manœuvre Ord"
+    ]
+
+    entites = Employe.objects.values_list('entite', flat=True).distinct()
+    entite_choisie = request.GET.get("entite")
+
+    if entite_choisie:
+        data = []
+        total_general = 0
+        for idx, grade in enumerate(GRADES_ORDONNES, start=1):
+            count = Employe.objects.filter(entite=entite_choisie, grade_actuel=grade).count()
+            data.append({
+                "numero": idx,
+                "grade": grade,
+                "effectif": count
+            })
+            total_general += count
+
+        return render(request, "personnel/effectif_par_grade.html", {
+            "titre": f"Effectif des agents par grade : {entite_choisie}",
+            "data": data,
+            "total_general": total_general,
+            "entites": entites,
+            "entite_choisie": entite_choisie
+        })
+    else:
+        return render(request, "personnel/effectif_par_grade.html", {
+            "entites": entites
+        })
+
+# Vue PDF
+def effectif_detaille_par_grade_pdf(request):
+    GRADES_ORDONNES = [
+        "Directeur", "Sous-Directeur", "Chef de Division", "Chef de Sce Ppal", "Chef de Service",
+        "Chef de Sce Adjt", "Chef de Section", "Rédacteur Ppal", "Rédacteur", "Rédacteur Adjt",
+        "Commis Chef", "Commis Ppal", "Commis", "Commis Adjt", "Agent Aux 1ère Cl",
+        "Agent Aux 2è Cl", "Manœuvre Sp", "Manœuvre Lourd", "Manœuvre Ord"
+    ]
+
+    entite_choisie = request.GET.get("entite")
+    if not entite_choisie:
+        return redirect("effectif_detaille_par_grade")
+
+    data = []
+    total_general = 0
+    for idx, grade in enumerate(GRADES_ORDONNES, start=1):
+        count = Employe.objects.filter(entite=entite_choisie, grade_actuel=grade).count()
+        data.append({
+            "numero": idx,
+            "grade": grade,
+            "effectif": count
+        })
+        total_general += count
+
+    html_string = render_to_string("personnel/effectif_par_grade_pdf.html", {
+        "titre": f"Effectif des agents par grade : {entite_choisie}",
+        "data": data,
+        "total_general": total_general
+    })
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; filename=effectif_par_grade.pdf"
+    HTML(string=html_string).write_pdf(response, stylesheets=[CSS(string="@page { size: portrait; }")])
+    return response
+
+

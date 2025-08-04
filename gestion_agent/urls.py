@@ -6,6 +6,7 @@ from django.views.static import serve
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
+from personnel.views_dashboard import total_agents_view  # en haut
 
 # ✅ Vue de redirection d'accueil
 def redirection_accueil(request):
@@ -28,6 +29,10 @@ urlpatterns = [
     path('dashboard/', tableau_de_bord, name='dashboard'),
     path('employes/', liste_employes, name='liste_employes'),
     path('employes/ajouter/', ajouter_employe, name='ajouter_employe'),
+    path('employes/total/', total_agents_view, name='liste_total_agents'),
+
+    # ✅ INCLURE ICI LE FICHIER PRINCIPAL urls.py DE L’APP PERSONNEL
+    path('', include('personnel.urls')),
 
     path('test/', lambda request: HttpResponse("OK"), name='test'),
 

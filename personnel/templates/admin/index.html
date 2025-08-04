@@ -10,12 +10,26 @@
   {{ block.super }}
 
   <style>
+    /* Centrer toute la section principale */
     #content {
       max-width: 1000px;
       margin: 0 auto;
       text-align: center;
     }
 
+    /* Masquer la colonne Actions récentes */
+    #content-related {
+      display: none;
+    }
+
+    /* Centrer aussi les titres des sections */
+    .module caption {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    /* Bloc pour les raccourcis personnalisés */
     .custom-shortcut {
       margin-top: 30px;
       padding: 20px;
@@ -24,28 +38,56 @@
       border-radius: 6px;
     }
 
-    .custom-shortcut a {
-      text-decoration: none;
-      font-weight: bold;
-      background-color: #1890ff;
-      color: white;
-      padding: 10px 25px;
-      border-radius: 4px;
-      margin: 10px;
-      display: inline-block;
-      transition: background-color 0.3s ease;
+    /* Bouton vers la liste des employés (vert) */
+    .btn-employes {
+      text-decoration: none !important;
+      font-weight: bold !important;
+      color: #ffffff !important;
+      background-color: #28a745 !important;
+      padding: 10px 25px !important;
+      border-radius: 4px !important;
+      margin: 10px !important;
+      display: inline-block !important;
+      transition: background-color 0.3s ease !important;
     }
 
-    .custom-shortcut a:hover {
-      background-color: #40a9ff;
+    .btn-employes:hover {
+      background-color: #218838 !important;
+      color: #ffffff !important;
+    }
+
+    /* Bouton vers le tableau de bord (bleu) */
+    .btn-dashboard {
+      text-decoration: none !important;
+      font-weight: bold !important;
+      color: #ffffff !important;
+      background-color: #1890ff !important;
+      padding: 10px 25px !important;
+      border-radius: 4px !important;
+      margin: 10px !important;
+      display: inline-block !important;
+      transition: background-color 0.3s ease !important;
+    }
+
+    .btn-dashboard:hover {
+      background-color: #40a9ff !important;
+      color: #ffffff !important;
+    }
+
+    /* Centrer aussi le titre "Site d'administration" */
+    #site-name {
+      text-align: center;
+      display: block;
+      width: 100%;
     }
   </style>
 
+  <!-- Raccourci vers la liste des employés -->
   <div class="custom-shortcut">
     <h2>Raccourcis personnalisés</h2>
     <p style="margin-top: 15px;">
-      <a href="{% url 'liste_employes' %}">👥 Accéder à la liste des employés</a>
-      <a href="{% url 'dashboard' %}">📊 Tableau de bord</a>
+      <a href="{% url 'liste_employes' %}" class="btn-employes">👥 Accéder à la liste des employés</a>
+      <a href="{% url 'dashboard' %}" class="btn-dashboard">📊 Tableau de bord</a>
     </p>
   </div>
 {% endblock %}

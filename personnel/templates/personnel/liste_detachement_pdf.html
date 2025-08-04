@@ -23,9 +23,17 @@
       padding: 5px;
     }
     th {
-      background-color: #e0e0e0;
+      background-color: #d0e7f9; /* bleu ciel */
       text-align: center;
     }
+
+    /* Largeur ajustée des colonnes */
+    th:nth-child(2), td:nth-child(2) { width: 20%; }  /* Nom */
+    th:nth-child(4), td:nth-child(4) { width: 15%; }  /* Grade actuel */
+    th:nth-child(8), td:nth-child(8) { width: 15%; }  /* Durée */
+    th:nth-child(6), td:nth-child(6) { width: 10%; }  /* Date détachement */
+    th:nth-child(7), td:nth-child(7) { width: 10%; }  /* Date fin détachement */
+
     td.center {
       text-align: center;
     }
@@ -50,7 +58,7 @@
     {% for item in donnees %}
     <tr>
       {% for val in item %}
-        <td class="{% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 6 %}center{% else %}left{% endif %}">
+        <td class="{% if forloop.counter in '1,3,5,6,7,8' %}center{% else %}left{% endif %}">
           {{ val|default:"-" }}
         </td>
       {% endfor %}

@@ -1,43 +1,111 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from django.views.static import serve
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.contrib.auth import views as auth_views
+import os
+from pathlib import Path
+from decouple import config
+import dj_database_url
 
-# ✅ Vue de redirection d'accueil
-def redirection_accueil(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')  # Redirige vers tableau de bord si connecté
-    else:
-        return redirect('login')  # Sinon vers login
+# 🔹 Répertoire de base
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ Vos vues personnalisées
-from personnel.views import accueil, liste_employes, ajouter_employe
-from personnel.views_dashboard import tableau_de_bord
+# 🔹 Clé secrète (gérée via variables d’environnement en production)
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-votre_clé_secrète_à_remplacer')
 
-urlpatterns = [
-    path('', redirection_accueil, name='redirection_accueil'),
-    path('admin/', admin.site.urls),
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('connexion/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='custom_login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+# 🔹 Mode DEBUG (True en local, False en production Render)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-    path('dashboard/', tableau_de_bord, name='dashboard'),
-    path('employes/', liste_employes, name='liste_employes'),
-    path('employes/ajouter/', ajouter_employe, name='ajouter_employe'),
+# 🔹 Hôtes autorisés (Render les définit via ALLOWED_HOSTS)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',') if not DEBUG else []
 
-    path('test/', lambda request: HttpResponse("OK"), name='test'),
-
-    path('personnel/', accueil, name='personnel_accueil'),
-    path('personnel/actifs/', include('personnel.urls_actifs')),
-    path('export/', include('personnel.urls_export')),
-    path('pdf/', include('personnel.urls_pdf')),
-    path('filtre/', include('personnel.urls_filtrage')),
+# 🔹 Applications installées
+INSTALLED_APPS = [
+    'personnel',  # Votre application RH
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'widget_tweaks',
 ]
 
-# ✅ Fichiers médias en développement
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# 🔹 Middleware (ajout de WhiteNoise pour fichiers statiques en prod)
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # AJOUT POUR RENDER
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# 🔹 Fichier urls.py principal
+ROOT_URLCONF = 'gestion_agent.urls'
+
+# 🔹 Templates (dossier "templates")
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],  # Dossier templates global
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+# 🔹 Application WSGI
+WSGI_APPLICATION = 'gestion_agent.wsgi.application'
+
+# 🔹 Base de données : SQLite en local, PostgreSQL sur Render
+if DEBUG:
+    # Mode local : SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Mode production : PostgreSQL via Render
+    DATABASES = {
+        'default': dj_database_url.config(default=config('DATABASE_URL'))
+    }
+
+# 🔹 Validation des mots de passe
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# 🔹 Langue et fuseau horaire
+LANGUAGE_CODE = 'fr-fr'
+TIME_ZONE = 'Africa/Kinshasa'
+USE_I18N = True
+USE_TZ = True
+
+# 🔹 Fichiers statiques
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Pour production
+
+# WhiteNoise : optimisation des fichiers statiques en prod
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 🔹 Fichiers médias
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# 🔹 Type de clé auto par défaut
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 🔹 Redirection après connexion réussie
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/dashboard/'

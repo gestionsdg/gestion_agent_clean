@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="text-align: center; font-size: 20px; margin-bottom: 20px; text-decoration: underline; font-weight: bold;">{{ titre|safe }}</h2>
+
+<!-- BOUTONS -->
+<div class="actions">
+  <a href="{% url 'liste_detachement_pdf' %}" target="_blank">
+    <button class="btn-imprimer">🖨️ Imprimer PDF</button>
+  </a>
+    <a href="{% url 'liste_employes' %}">
+        <button class="btn-retour">⬅ Retour à la liste</button>
+    </a>
+    <button class="btn-imprimer" onclick="window.print()">🖨️ Imprimer</button>
+</div>
+
+<!-- TABLEAU -->
+<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+  <thead>
+    <tr style="background-color: #e0e0e0;">
+      {% for col in colonnes %}
+        <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ col }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in donnees %}
+    <tr>
+      {% for val in item %}
+      <td style="border: 1px solid #ccc; padding: 6px;
+        {% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 6 %}
+          text-align: center;
+        {% elif forloop.counter == 2 or forloop.counter == 4 or forloop.counter == 7 %}
+          text-align: left;
+        {% else %}
+          text-align: left;
+        {% endif %}
+      ">
+        {{ val|default:"-" }}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- STYLES -->
+<style>
+  .actions {
+    text-align: right;
+    margin-bottom: 15px;
+  }
+  .btn-retour, .btn-imprimer {
+    padding: 6px 12px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .btn-retour {
+    background-color: #888;
+  }
+  .btn-imprimer {
+    background-color: #007BFF;
+  }
+  @media print {
+        @page { size: landscape; }
+    .actions {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}

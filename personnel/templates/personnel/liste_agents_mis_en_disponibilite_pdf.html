@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Agents mis en disponibilité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        h2 {
+            text-align: center;
+            text-decoration: underline;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-size: 11px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px;
+        }
+        /* Titres centrés et bleu ciel */
+        th {
+            text-align: center;
+            background-color: #d0e7f9;
+        }
+        /* Contenu centré */
+        .center {
+            text-align: center;
+        }
+        /* Contenu aligné à gauche */
+        .left {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Liste des agents mis en disponibilité</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Grade actuel</th>
+                <th>Sexe</th>
+                <th>Date mise en disponibilité</th>
+                <th>Date fin en disponibilité</th>
+                <th>Durée</th>
+                <th>Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i, agent in donnees.items %}
+            <tr>
+                <td class="center">{{ i }}</td>
+                <td class="left">{{ agent.nom }}</td>
+                <td class="center">{{ agent.matricule }}</td>
+                <td class="left">{{ agent.grade }}</td>
+                <td class="center">{{ agent.sexe }}</td>
+                <td class="center">{{ agent.date_dispo }}</td>
+                <td class="center">{{ agent.date_fin_dispo }}</td>
+                <td class="center">{{ agent.duree }}</td>
+                <td class="left">{{ agent.entite }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

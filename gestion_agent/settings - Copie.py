@@ -1,25 +1,32 @@
-
+import os
 from pathlib import Path
-from decouple import config
 
+# 🔹 Répertoire de base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('DJANGO_SECRET_KEY', default='change-me')
-DEBUG = config('DEBUG', default=False, cast=bool)
+# 🔹 Clé secrète (à sécuriser en production)
+SECRET_KEY = 'django-insecure-votre_clé_secrète_à_remplacer'
 
-ALLOWED_HOSTS = ['gestion-agent.onrender.com']
+# 🔹 Mode DEBUG activé pour développement local
+DEBUG = True
 
+# 🔹 Hôtes autorisés (aucun pour local)
+ALLOWED_HOSTS = []
+
+# 🔹 Applications installées
 INSTALLED_APPS = [
+    'personnel',  # Votre application RH
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'personnel',
     'widget_tweaks',
+    
 ]
 
+# 🔹 Middleware (par défaut)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -30,15 +37,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# 🔹 Fichier urls.py principal
 ROOT_URLCONF = 'gestion_agent.urls'
 
+# 🔹 Templates (dossier "templates")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'templates',
-            BASE_DIR / 'personnel' / 'templates',
-        ],
+        'DIRS': [BASE_DIR / 'templates'],  # Dossier templates global
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -51,8 +57,10 @@ TEMPLATES = [
     },
 ]
 
+# 🔹 Application WSGI
 WSGI_APPLICATION = 'gestion_agent.wsgi.application'
 
+# 🔹 Base de données SQLite pour local
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -60,6 +68,7 @@ DATABASES = {
     }
 }
 
+# 🔹 Validation des mots de passe (par défaut)
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -67,26 +76,23 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'fr'
-TIME_ZONE = 'UTC'
+# 🔹 Langue et fuseau horaire
+LANGUAGE_CODE = 'fr-fr'
+TIME_ZONE = 'Africa/Kinshasa'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# 🔹 Fichiers statiques
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Pour production
 
+# 🔹 Fichiers médias (images, photos d'agents, etc.)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/connexion/'
+# 🔹 Type de clé auto par défaut
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
-CSRF_USE_SESSIONS = True
+# 🔹 Redirection après connexion réussie
+LOGIN_REDIRECT_URL = '/dashboard/'

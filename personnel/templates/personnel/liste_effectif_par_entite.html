@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Effectif des Agents par Entité</title>
+    <style>
+        table { width: 70%; border-collapse: collapse; margin: 20px auto; font-size: 16px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        td.entite { text-align: left; }
+        .total-row { font-weight: bold; background-color: #e0e0e0; }
+        .btn { display: inline-block; margin: 20px auto; padding: 8px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn-retour { margin-left: 10px; }
+        @media print { .btn { display: none; } }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center; text-decoration: underline;">
+        Effectif des Agents par Entité
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Entité</th>
+                <th>Effectif agents</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in donnees %}
+            <tr>
+                <td>{{ ligne.numero }}</td>
+                <td class="entite">{{ ligne.entite }}</td>
+                <td>{{ ligne.effectif }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="2">Total général</td>
+                <td>{{ total_general }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div style="text-align:center;">
+        <a href="{% url 'liste_effectif_par_entite_pdf' %}" target="_blank" class="btn">
+            Imprimer en PDF
+        </a>
+        <a href="{% url 'liste_employes' %}" class="btn btn-retour">Retour à la liste</a>
+    </div>
+</body>
+</html>

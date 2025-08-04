@@ -1,0 +1,98 @@
+{% load extra_filters %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Agents de la CNSS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            text-decoration: underline;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            font-size: 12px;
+        }
+        /* Titres du tableau centrés */
+        th {
+            text-align: center;
+            background-color: #d0e7f9;
+        }
+        /* Colonnes spécifiques alignées à gauche */
+        td.col-nom,
+        td.col-prenom,
+        td.col-grade,
+        td.col-service,
+        td.col-fonction,
+        td.col-statut,
+        td.col-entite {
+            text-align: left;
+        }
+        /* Largeurs spécifiques */
+        th.col-grade, td.col-grade {
+            width: 120px;  /* Augmentée */
+        }
+        th.col-service, td.col-service,
+        th.col-fonction, td.col-fonction {
+            width: 120px;  /* Réduite */
+        }
+        /* Colonnes par défaut centrées */
+        td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des Cadres et Agents de la CNSS</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Matricule</th>
+                <th class="col-grade">Grade actuel</th>
+                <th>Sexe</th>
+                <th class="col-service">Service</th>
+                <th class="col-fonction">Fonction</th>
+                <th>Statut</th>
+                <th>Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employes %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="col-nom">{{ emp.nom|default:"-" }}</td>
+                <td class="col-prenom">{{ emp.prenom|default:"-" }}</td>
+                <td>{{ emp.matricule|default:"-" }}</td>
+                <td class="col-grade">{{ emp.grade_actuel|default:"-" }}</td>
+                <td>{{ emp.sexe|default:"-" }}</td>
+                <td class="col-service">{{ emp.service|default:"-" }}</td>
+                <td class="col-fonction">{{ emp.fonction|default:"-" }}</td>
+                <td class="col-statut">{{ emp.statut|default:"-" }}</td>
+                <td class="col-entite">{{ emp.entite|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" style="text-align:center;">Aucun agent trouvé</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

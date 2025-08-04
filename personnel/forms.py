@@ -36,6 +36,17 @@ class EmployeForm(forms.ModelForm):
         widget=forms.DateInput(format='%d/%m/%Y'),
         input_formats=['%d/%m/%Y', '%Y-%m-%d']
     )
+    # AJOUT NOUVEAU CHAMP
+    date_fin_disponibilite = forms.DateField(
+        required=False,
+        widget=forms.DateInput(format='%d/%m/%Y'),
+        input_formats=['%d/%m/%Y', '%Y-%m-%d']
+    )
+    date_fin_detachement = forms.DateField(
+        required=False,
+        widget=forms.DateInput(format='%d/%m/%Y'),
+        input_formats=['%d/%m/%Y', '%Y-%m-%d']
+    )
 
     class Meta:
         model = Employe
@@ -45,7 +56,7 @@ class EmployeForm(forms.ModelForm):
             'sexe', 'date_naissance', 'niveau_etudes', 'option', 'etat_civil', 'service',
             'date_affectation', 'fonction', 'date_prise_fonction', 'adresse',
             'telephone1', 'telephone2', 'parcours_professionnel', 'formations_suivies',
-            'besoin_en_formation', 'statut', 'date_statut', 'entite'
+            'besoin_en_formation', 'statut', 'date_statut', 'date_fin_disponibilite', 'date_fin_detachement', 'entite'
         ]
 
     def clean(self):

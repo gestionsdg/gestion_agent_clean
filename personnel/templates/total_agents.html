@@ -1,0 +1,92 @@
+{% load extra_filters %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Agents</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 10px; font-size: 13px; }
+        h1 { text-align: center; color: #333; font-size: 20px; margin-bottom: 10px; text-decoration: underline; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: fixed; }
+        th, td { border: 1px solid #ccc; padding: 4px 6px; word-wrap: break-word; font-size: 13px; }
+        th { background-color: #d0e7f9; text-align: center; }
+        th.col-num, td.col-num { width: 40px; text-align: center; }
+        th.col-matricule, td.col-matricule { width: 60px; text-align: center; }
+        th.col-sexe, td.col-sexe { width: 35px; text-align: center; }
+        th.col-nom, td.col-nom { width: 160px; }
+        th.col-fonction, td.col-fonction { width: 150px; }
+        th.col-service, td.col-service { width: 160px; }
+        th.col-entite, td.col-entite { width: 160px; }
+        td { text-align: left; }
+        .pagination { text-align: center; margin-top: 15px; font-size: 12px; }
+        .pagination a, .pagination span {
+            padding: 3px 6px; margin: 0 2px; border: 1px solid #ccc; text-decoration: none; color: #333;
+        }
+        .pagination .current { background-color: #333; color: #fff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Liste des Cadres et Agents de la CNSS</h1>
+	<!-- Bouton retour à la liste des employés -->
+	<div style="text-align: center; margin-bottom: 15px;">
+		<a href="{% url 'liste_employes' %}">
+			<button style="padding: 6px 12px; background-color: #007bff; border: none; color: white; font-size: 13px; cursor: pointer;">
+				⬅ Retour à la liste des employés
+			</button>
+		</a>
+		<a href="{% url 'liste_total_agents_pdf' %}" target="_blank">
+			<button style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 5px;">
+				🖨️ Imprimer la liste (PDF)
+			</button>
+		</a>
+	</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="col-num">N°</th>
+                <th class="col-nom">Nom</th>
+                <th>Prénom</th>
+                <th class="col-matricule">Matricule</th>
+                <th>Grade actuel</th>
+                <th class="col-sexe">Sexe</th>
+                <th>Service</th>
+                <th class="col-fonction">Fonction</th>
+                <th>Statut</th>
+                <th class="col-entite">Entité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in page_obj %}
+            <tr>
+                <td class="col-num">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td class="col-nom">{{ emp.nom|clean_nan }}</td>
+                <td>{{ emp.prenom|clean_nan }}</td>
+                <td class="col-matricule">{{ emp.matricule|clean_nan }}</td>
+                <td>{{ emp.grade_actuel|clean_nan }}</td>
+                <td class="col-sexe">{{ emp.sexe|clean_nan }}</td>
+                <td>{{ emp.service|clean_nan }}</td>
+                <td class="col-fonction">{{ emp.fonction|clean_nan }}</td>
+                <td>{{ emp.statut|clean_nan }}</td>
+                <td class="col-entite">{{ emp.entite|clean_nan }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" style="text-align: center;">Aucun résultat trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« première</a>
+            <a href="?page={{ page_obj.previous_page_number }}">‹ précédente</a>
+        {% endif %}
+        <span class="current">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">suivante ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">dernière »</a>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,198 @@
+{% load extra_filters %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Agents</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 10px; font-size: 13px; }
+        h1 { text-align: center; color: #333; font-size: 20px; margin-bottom: 10px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: fixed; }
+        th, td { border: 1px solid #ccc; padding: 4px 6px; word-wrap: break-word; font-size: 13px; }
+        th { background-color: #d0e7f9; text-align: center; }
+        th.col-num, td.col-num { width: 40px; text-align: center; }
+        th.col-matricule, td.col-matricule { width: 60px; text-align: center; }
+        th.col-sexe, td.col-sexe { width: 35px; text-align: center; }
+        th.col-nom, td.col-nom { width: 160px; }
+        th.col-fonction, td.col-fonction { width: 150px; }
+        th.col-service, td.col-service { width: 160px; }
+        th.col-entite, td.col-entite { width: 160px; }
+        td { text-align: left; }
+        .pagination { text-align: center; margin-top: 15px; font-size: 12px; }
+        .pagination a, .pagination span {
+            padding: 3px 6px; margin: 0 2px; border: 1px solid #ccc; text-decoration: none; color: #333;
+        }
+        .pagination .current { background-color: #333; color: #fff; font-weight: bold; }
+        .btn-group { text-align: center; margin-bottom: 10px; }
+        .btn-group a button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            margin: 0 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .form-filtres {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .form-filtres input, .form-filtres select, .form-filtres button {
+            padding: 5px;
+            margin: 2px;
+            font-size: 12px;
+        }
+        .action-buttons button {
+            padding: 4px 6px;
+            margin: 0 2px;
+            border: none;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .modifier-btn { background-color: orange; }
+        .pdf-btn { background-color: teal; }
+    </style>
+</head>
+<body>
+    <h1 style="text-decoration: underline;">Liste des Cadres et Agents de la CNSS</h1>
+	
+    <!-- Première ligne de boutons -->
+    <div class="btn-group" style="margin-bottom: 10px;">
+        {% if not lecture_seule %}
+            <a href="{% url 'ajouter_employe' %}">
+                <button style="background-color: green;">+ Ajouter un employé</button>
+            </a>
+        {% endif %}
+        <a href="{% url 'liste_actifs_par_entite' %}">
+            <button style="background-color: #007bff;">📄 Cadres et Agents actifs</button>
+        </a>
+        <a href="{% url 'liste_retraitables_pdf' %}" target="_blank">
+            <button style="background-color: #d9534f; color: white;">📄 Cadres et Agents retraitables</button>
+        </a>
+        <a href="{% url 'liste_responsables_coordonnateurs' %}">
+            <button style="background-color: #20B2AA;">🖌️Responsables de Service</button>
+        </a>
+        <a href="{% url 'liste_controleurs' %}">
+            <button style="background-color: navy;">📋 Contrôleurs</button>
+        </a>
+        {% if request.user.groups.all.0.name == 'Administration RH' or request.user.is_superuser %}
+            <a href="{% url 'export_employes_excel_complet' %}">
+                <button style="background-color: purple;">📤 Exporter Excel</button>
+            </a>
+        {% endif %}
+    </div>   
+
+    <!-- Nouvelle ligne avec boutons Effectif + navigation -->
+    <div class="btn-group" style="margin-bottom: 10px;">
+
+       <div class="btn-group" style="margin-bottom: 10px;">
+
+	<!-- Bouton vers Effectif détaillé par grade (nouveau système) -->
+	<a href="{% url 'effectif_detaille_par_grade' %}">
+    <button style="background-color: #17a2b8; color: white;">📊 Effectif détaillé par grade</button>
+	</a>
+
+    <!-- Bouton vers Effectif simple par grade -->
+    <a href="{% url 'liste_effectif_par_grade_pdf' %}" target="_blank">
+        <button style="background-color: #17a2b8; color: white;">📊 Effectif simple par grade (PDF)</button>
+    </a>
+
+    <!-- Bouton vers Effectif par entité -->
+    <a href="{% url 'liste_effectif_par_entite_pdf' %}" target="_blank">
+        <button style="background-color: #6c757d; color: white;">📊 Effectif par entité (PDF)</button>
+    </a>
+	</div>
+
+        {% if request.user.groups.all.0.name == 'Administration RH' or request.user.is_superuser %}
+            <a href="/admin/">
+                <button style="background-color: #000000;">🔙 Retour à l'administration</button>
+            </a>
+        {% endif %}
+        <a href="{% url 'dashboard' %}">
+            <button style="background-color: #888;">⬅ Retour au tableau de bord</button>
+        </a>
+        <a href="{% url 'logout' %}">
+            <button style="background-color: darkred;">🔒 Quitter</button>
+        </a>
+    </div>  
+
+    <form method="get" class="form-filtres">
+        <input type="text" name="q" placeholder="Rechercher nom, prénom, matricule" value="{{ query }}">
+        <select name="grade">
+            <option value="">-- Grade actuel --</option>
+            {% for g in grades %}
+                <option value="{{ g }}" {% if grade == g %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+        </select>
+        <select name="entite">
+            <option value="">-- Entité --</option>
+            {% for e in entites %}
+                <option value="{{ e }}" {% if entite == e %}selected{% endif %}>{{ e }}</option>
+            {% endfor %}
+        </select>
+        <select name="statut">
+            <option value="">-- Statut --</option>
+            {% for s in statuts %}
+                <option value="{{ s }}" {% if statut == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Rechercher</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="col-num">N°</th>
+                <th class="col-nom">Nom</th>
+                <th>Prénom</th>
+                <th class="col-matricule">Matricule</th>
+                <th>Grade actuel</th>
+                <th class="col-sexe">Sexe</th>
+                <th>Service</th>
+                <th class="col-fonction">Fonction</th>
+                <th>Statut</th>
+                <th class="col-entite">Entité</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in page_obj %}
+            <tr>
+                <td class="col-num">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td class="col-nom">{{ emp.nom|clean_nan }}</td>
+                <td>{{ emp.prenom|clean_nan }}</td>
+                <td class="col-matricule">{{ emp.matricule|clean_nan }}</td>
+                <td>{{ emp.grade_actuel|clean_nan }}</td>
+                <td class="col-sexe">{{ emp.sexe|clean_nan }}</td>
+                <td>{{ emp.service|clean_nan }}</td>
+                <td class="col-fonction">{{ emp.fonction|clean_nan }}</td>
+                <td>{{ emp.statut|clean_nan }}</td>
+                <td class="col-entite">{{ emp.entite|clean_nan }}</td>
+                <td class="action-buttons">
+            {% if not lecture_seule %}
+                    <a href="{% url 'modifier_employe' emp.id %}"><button class="modifier-btn">Modifier</button></a>
+            {% endif %}
+                    <a href="{% url 'fiche_employe_pdf' emp.id %}" target="_blank"><button class="pdf-btn">PDF</button></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="11" style="text-align: center;">Aucun résultat trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« première</a>
+            <a href="?page={{ page_obj.previous_page_number }}">‹ précédente</a>
+        {% endif %}
+        <span class="current">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">suivante ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">dernière »</a>
+        {% endif %}
+    </div>
+</body>
+</html>

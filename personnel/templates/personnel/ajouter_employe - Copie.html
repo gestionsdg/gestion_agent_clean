@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un employé</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .retour {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .retour a {
+            background-color: #555;
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        form {
+            max-width: 800px;
+            margin: auto;
+            background: #f7f7f7;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: steelblue;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="retour">
+        <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
+    </div>
+
+    <h2>Ajouter un Employé</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Enregistrer</button>
+    </form>
+</body>
+</html>

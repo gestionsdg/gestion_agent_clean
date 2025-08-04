@@ -1,1 +1,2 @@
-web: gunicorn gestion_agent.wsgi
+web: gunicorn gestion_agent.wsgi:application
+

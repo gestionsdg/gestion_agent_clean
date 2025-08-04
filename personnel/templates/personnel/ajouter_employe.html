@@ -52,11 +52,17 @@
         <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
     </div>
 
-    <h2>Ajouter un Employé</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Enregistrer</button>
-    </form>
+    {% if perms.personnel.add_employe %}
+        <h2>Ajouter un Employé</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Enregistrer</button>
+        </form>
+    {% else %}
+        <div style="text-align:center; color:red; font-size:18px;">
+            ⛔ Vous n’avez pas la permission d’ajouter un employé.
+        </div>
+    {% endif %}
 </body>
 </html>

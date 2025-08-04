@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        h2 {
+            text-align: center;
+            text-decoration: underline;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 6px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td.entite {
+            text-align: left;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Effectif des Agents par Entité</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Entité</th>
+                <th>Effectif agents</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in donnees %}
+            <tr>
+                <td>{{ ligne.numero }}</td>
+                <td class="entite">{{ ligne.entite }}</td>
+                <td>{{ ligne.effectif }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="2">Total général</td>
+                <td>{{ total_general }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

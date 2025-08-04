@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  h2 {
+    text-align: center;
+    text-decoration: underline;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 13px;
+  }
+  th {
+    text-align: center;
+    background-color: #f2f2f2;
+  }
+  td.center {
+    text-align: center;
+  }
+  td.left {
+    text-align: left;
+  }
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .filters form {
+    margin: 0 10px;
+  }
+
+  /* Surbrillance spécifique */
+  .bg-fonction {
+    background-color: #d0ecff !important; /* bleu-ciel */
+  }
+
+  .bg-grade {
+    background-color: #d6f5d6 !important; /* vert clair */
+  }
+</style>
+
+<h2>{{ titre }}</h2>
+
+<div class="filters">
+  <!-- Bouton retour -->
+  <a href="{% url 'liste_employes' %}">
+    <button style="background-color: #0066cc; color: white;">⬅ Retour à la liste des employés</button>
+  </a>
+
+  <!-- Filtre entité -->
+  <form method="get">
+    <label for="entite">Filtrer par entité :</label>
+    <select name="entite" id="entite" onchange="this.form.submit()">
+      <option value="">-- Toutes les entités --</option>
+      {% for ent in entites %}
+        <option value="{{ ent }}" {% if selected_entite == ent %}selected{% endif %}>{{ ent }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <!-- Bouton PDF avec filtre -->
+  <a href="{% url 'liste_responsables_coordonnateurs_pdf' %}?{% if selected_entite %}entite={{ selected_entite }}{% endif %}">
+    <button style="background-color: #28a745; color: white;">🖨️ Imprimer PDF</button>
+  </a>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      {% for col in colonnes %}
+        <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ligne in donnees %}
+    {% with fonction=ligne.6 grade=ligne.3 %}
+    <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade == 'Chef de Sce Adjt' or grade == 'Chef de Section' or grade == 'Rédacteur Ppal' or grade == 'Rédacteur' %}bg-grade{% endif %}">
+      <td class="center">{{ ligne.0 }}</td>
+      <td class="left">{{ ligne.1 }}</td>
+      <td class="center">{{ ligne.2 }}</td>
+      <td class="left">{{ ligne.3 }}</td>
+      <td class="center">{{ ligne.4 }}</td>
+      <td class="left">{{ ligne.5 }}</td>
+      <td class="left">{{ ligne.6 }}</td>
+      <td class="center">{{ ligne.7 }}</td>
+      <td class="center">{{ ligne.8 }}</td>
+      <td class="left">{{ ligne.9 }}</td>
+    </tr>
+    {% endwith %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

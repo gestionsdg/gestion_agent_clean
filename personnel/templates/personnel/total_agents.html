@@ -1,0 +1,51 @@
+
+{% load static %}
+{% load extra_filters %}
+
+{% block content %}
+  <h1 style="text-align: center; font-size: 22px; text-decoration: underline;">Liste complète des agents de la CNSS</h1>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px;">
+    <thead>
+      <tr style="background-color: #f0f0f0;">
+        <th style="border: 1px solid #ccc; padding: 6px;">Nom</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Matricule</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Sexe</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Grade actuel</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Entité</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for employe in page_obj %}
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.nom }}</td>
+          <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ employe.matricule }}</td>
+          <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ employe.sexe }}</td>
+          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.grade_actuel }}</td>
+          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.entite }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" style="text-align:center;">Aucun agent trouvé.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div style="text-align: center; margin-top: 20px;">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+        <a href="?page=1">« première</a>
+        <a href="?page={{ page_obj.previous_page_number }}">‹ précédente</a>
+      {% endif %}
+
+      <span style="margin: 0 10px;">
+        Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">suivante ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">dernière »</a>
+      {% endif %}
+    </span>
+  </div>
+{% endblock %}

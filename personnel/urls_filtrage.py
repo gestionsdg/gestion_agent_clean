@@ -1,5 +1,5 @@
 from django.urls import path
-from personnel import views_export  # ✅ correction ici
+from personnel import views_export
 
 urlpatterns = [
     path('actifs_par_entite/', views_export.liste_actifs_par_entite, name='liste_actifs_par_entite'),

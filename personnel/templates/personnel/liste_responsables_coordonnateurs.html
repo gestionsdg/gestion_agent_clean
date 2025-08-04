@@ -78,7 +78,7 @@
   <tbody>
     {% for ligne in donnees %}
     {% with fonction=ligne.6 grade=ligne.3 %}
-    <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade == 'Chef de Sce Adjt' or grade == 'Chef de Section' or grade == 'Rédacteur Ppal' or grade == 'Rédacteur' %}bg-grade{% endif %}">
+    <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade in 'Chef de Sce Adjt,Chef de Section,Rédacteur Ppal,Rédacteur' %}bg-grade{% endif %}">
       <td class="center">{{ ligne.0 }}</td>
       <td class="left">{{ ligne.1 }}</td>
       <td class="center">{{ ligne.2 }}</td>
