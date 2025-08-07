@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
@@ -10,12 +9,12 @@ from django.contrib.auth import views as auth_views
 from personnel.views import accueil, liste_employes, ajouter_employe
 from personnel.views_dashboard import tableau_de_bord, total_agents_view
 
-# Vue de redirection d'accueil
+# ✅ Vue de redirection d'accueil
 def redirection_accueil(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')  # Redirige vers tableau de bord si connecté
+        return redirect('dashboard')
     else:
-        return redirect('login')  # Sinon vers login
+        return redirect('login')
 
 urlpatterns = [
     path('', redirection_accueil, name='redirection_accueil'),
@@ -38,6 +37,6 @@ urlpatterns = [
     path('filtre/', include('personnel.urls_filtrage')),
 ]
 
-# Fichiers médias en développement
+# ✅ Fichiers médias en développement
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
