@@ -13,7 +13,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-votre_clé_secrète_�
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Hôtes autorisés
-ALLOWED_HOSTS = ['gestion-agent-clean.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['gestion-agent.onrender.com', '127.0.0.1', 'localhost']
 
 # Applications installées
 INSTALLED_APPS = [
