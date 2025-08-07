@@ -7,11 +7,10 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 
-# ✅ Import des vues personnalisées
 from personnel.views import accueil, liste_employes, ajouter_employe
 from personnel.views_dashboard import tableau_de_bord, total_agents_view
 
-# ✅ Vue de redirection d'accueil
+# Vue de redirection d'accueil
 def redirection_accueil(request):
     if request.user.is_authenticated:
         return redirect('dashboard')  # Redirige vers tableau de bord si connecté
@@ -30,11 +29,8 @@ urlpatterns = [
     path('employes/ajouter/', ajouter_employe, name='ajouter_employe'),
     path('employes/total/', total_agents_view, name='liste_total_agents'),
 
-    # ✅ Inclusion des URLs de l’app personnel
     path('', include('personnel.urls')),
-
     path('test/', lambda request: HttpResponse("OK"), name='test'),
-
     path('personnel/', accueil, name='personnel_accueil'),
     path('personnel/actifs/', include('personnel.urls_actifs')),
     path('export/', include('personnel.urls_export')),
@@ -42,6 +38,6 @@ urlpatterns = [
     path('filtre/', include('personnel.urls_filtrage')),
 ]
 
-# ✅ Fichiers médias en développement
+# Fichiers médias en développement
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
