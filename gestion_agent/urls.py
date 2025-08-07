@@ -9,12 +9,11 @@ from django.contrib.auth import views as auth_views
 from personnel.views import accueil, liste_employes, ajouter_employe
 from personnel.views_dashboard import tableau_de_bord, total_agents_view
 
-# ✅ Vue de redirection d'accueil
+# Vue d'accueil : redirection si connecté ou non
 def redirection_accueil(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    else:
-        return redirect('login')
+    return redirect('login')
 
 urlpatterns = [
     path('', redirection_accueil, name='redirection_accueil'),
@@ -37,6 +36,5 @@ urlpatterns = [
     path('filtre/', include('personnel.urls_filtrage')),
 ]
 
-# ✅ Fichiers médias en développement
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
