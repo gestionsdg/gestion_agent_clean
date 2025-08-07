@@ -1,0 +1,129 @@
+{% block content %}
+<div style="border: 2px solid #00bfff; border-radius: 12px; padding: 20px; margin: 20px;">
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+  <h2 style="font-size: 35px; font-weight: bold; text-decoration: underline; margin: 0 auto;">
+    Tableau de Bord
+  </h2>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 40px;">
+  <a href="{% url 'liste_total_agents' %}">
+    <div class="card-dashboard" style="background-color: #007bff; color: white;">
+      <div style="font-size: 50px;">👥</div>
+      <div style="font-size: 20px; font-weight: bold;">Total Agents</div>
+      <div style="font-size: 30px;">{{ total }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_actifs_par_entite' %}">
+    <div class="card-dashboard" style="background-color: #28a745; color: white;">
+      <div style="font-size: 50px;">✅</div>
+      <div style="font-size: 20px; font-weight: bold;">Agents Actifs</div>
+      <div style="font-size: 30px;">{{ actifs }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_retraites_pdf' %}">
+    <div class="card-dashboard" style="background-color: #ffc107; color: black;">
+      <div style="font-size: 50px;">👴</div>
+      <div style="font-size: 20px; font-weight: bold;">Retraités</div>
+      <div style="font-size: 30px;">{{ retraites }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_decedes_pdf' %}">
+    <div class="card-dashboard" style="background-color: #dc3545; color: white;">
+      <div style="font-size: 50px;">⚰️</div>
+      <div style="font-size: 20px; font-weight: bold;">Agents décédés</div>
+      <div style="font-size: 30px;">{{ decedes }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_agents_ayant_ete_licencies_pdf' %}">
+    <div class="card-dashboard" style="background-color: #228B22; color: white;">
+      <div style="font-size: 50px;">❌</div>
+      <div style="font-size: 20px; font-weight: bold;">Agents ayant été licenciés</div>
+      <div style="font-size: 30px;">{{ agents_ayant_ete_licencies }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_demissionnaires_pdf' %}">
+    <div class="card-dashboard" style="background-color: #17a2b8; color: white;">
+      <div style="font-size: 50px;">📤</div>
+      <div style="font-size: 20px; font-weight: bold;">Démissionnaires</div>
+      <div style="font-size: 30px;">{{ demissionnaires }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_detachement_pdf' %}">
+    <div class="card-dashboard" style="background-color: #20c997; color: white;">
+      <div style="font-size: 50px;">🧳</div>
+      <div style="font-size: 20px; font-weight: bold;">Agents en détachement</div>
+      <div style="font-size: 30px;">{{ en_detachement }}</div>
+    </div>
+  </a>
+
+  <a href="{% url 'liste_agents_mis_en_disponibilite_pdf' %}">
+    <div class="card-dashboard" style="background-color: #6610f2; color: white;">
+      <div style="font-size: 50px;">📂</div>
+      <div style="font-size: 20px; font-weight: bold;">Agents mis en disponibilité</div>
+      <div style="font-size: 30px;">{{ en_disponibilite }}</div>
+    </div>
+  </a>
+</div>
+
+<!-- Boutons navigation placés juste en dessous -->
+<div style="width: 100%; text-align: center; margin-top: 25px;">
+  <a href="{% url 'liste_employes' %}">
+    <button class="btn btn-secondary">➡ Accéder à la liste des agents</button>
+  </a>
+  {% if is_admin_rh %}
+    <a href="/admin/" style="margin-left: 10px;">
+      <button class="btn btn-secondary">↩️ Retour à l'Interface Admin</button>
+    </a>
+  {% endif %}
+</div>
+
+<style>
+  .card-dashboard {
+    width: 180px;
+    height: 130px;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .card-dashboard:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    margin: 5px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+</style>
+{% endblock %}

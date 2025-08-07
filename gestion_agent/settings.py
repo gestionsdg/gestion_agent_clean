@@ -3,34 +3,35 @@ from pathlib import Path
 from decouple import config
 import dj_database_url
 
-# 🔹 Répertoire de base
+# Répertoire de base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 🔹 Clé secrète (gérée via variables d’environnement en production)
+# Clé secrète (gérée via variables d’environnement en production)
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-votre_clé_secrète_à_remplacer')
 
-# 🔹 Mode DEBUG (True en local, False en production Render)
-DEBUG = config('DEBUG', default=True, cast=bool)
+# Mode DEBUG (True en local, False en production Render)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# 🔹 Hôtes autorisés (Render les définit via ALLOWED_HOSTS)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',') if not DEBUG else []
+# Hôtes autorisés
+ALLOWED_HOSTS = ['gestion-agent-clean.onrender.com', '127.0.0.1', 'localhost']
 
-# 🔹 Applications installées
+# Applications installées
 INSTALLED_APPS = [
-    'personnel',  # Votre application RH
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # vos apps ici
+    'personnel',
     'widget_tweaks',
 ]
 
-# 🔹 Middleware (ajout de WhiteNoise pour fichiers statiques en prod)
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # AJOUT POUR RENDER
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Pour gérer les fichiers statiques en prod
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -39,14 +40,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# 🔹 Fichier urls.py principal
 ROOT_URLCONF = 'gestion_agent.urls'
 
-# 🔹 Templates (dossier "templates")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Dossier templates global
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -59,53 +58,34 @@ TEMPLATES = [
     },
 ]
 
-# 🔹 Application WSGI
 WSGI_APPLICATION = 'gestion_agent.wsgi.application'
 
-# 🔹 Base de données : SQLite en local, PostgreSQL sur Render
-if DEBUG:
-    # Mode local : SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    # Mode production : PostgreSQL via Render
-    DATABASES = {
-        'default': dj_database_url.config(default=config('DATABASE_URL'))
-    }
+# Base de données
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db.sqlite3')),
+        conn_max_age=600
+    )
+}
 
-# 🔹 Validation des mots de passe
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-# 🔹 Langue et fuseau horaire
-LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = 'Africa/Kinshasa'
-USE_I18N = True
-USE_TZ = True
-
-# 🔹 Fichiers statiques
+# Fichiers statiques
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Pour production
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# WhiteNoise : optimisation des fichiers statiques en prod
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# 🔹 Fichiers médias
+# Fichiers médias (si utilisés)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# 🔹 Type de clé auto par défaut
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Paramètres de sécurité pour la prod
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
 
-# 🔹 Redirection après connexion réussie
-LOGIN_URL = '/connexion/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/connexion/'
+
