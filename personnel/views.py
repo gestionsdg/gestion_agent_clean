@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import logout
+from django.http import HttpResponse  # ✅ AJOUT
 
 # 🔄 Redirection depuis l'admin vers la liste des employés
 @login_required
@@ -148,8 +149,4 @@ def effectif_detaille_par_grade(request):
 
 # ===============================
 # Gestion des permissions refusées
-# ===============================
-def custom_permission_denied_view(request, exception=None):
-    return render(request, 'personnel/acces_refuse.html', {
-        'message': "⛔ Vous n’avez pas la permission d’accéder à cette page."
-    })
+# ===============
