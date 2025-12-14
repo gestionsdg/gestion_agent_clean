@@ -1,5 +1,62 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page { size: A4 landscape; margin: 1cm; }
+    body { font-family: Arial, sans-serif; font-size: 13px; padding-bottom: 40px; } /* ✅ espace footer */
+
+    /* Logo seul en haut à gauche */
+    .logo-top { margin-bottom: 8px; text-align: left; }
+    .logo-top img { max-height: 60px; display: block; }
+
+    /* Titre centré sous le logo (conserve le soulignement existant) */
+    h2 { margin: 0; text-decoration: underline; font-weight: bold; text-align: center; }
+
+    /* Tableau */
+    table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    .tbl th, .tbl td { border: 1px solid #999 !important; padding: 6px; }
+    .tbl thead th { text-align: center; background-color: #B2E0F7 !important; } /* bleu ciel très clair */
+
+    /* Alignements : tout centré, sauf Nom (2) et Entité (8) à gauche */
+    .tbl td { text-align: center; }
+    .tbl td:nth-child(2),
+    .tbl td:nth-child(8) { text-align: left !important; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .tbl thead th { background-color: #ADD8E6 !important; } /* renfort impression */
+      .tbl th, .tbl td { border: 1px solid #999 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ Logo en haut à gauche -->
+<div class="logo-top">
+  {% if logo_b64 %}
+    <img src="{{ logo_b64 }}" alt="Logo">
+  {% endif %}
+</div>
+
+<!-- ✅ Titre sous le logo -->
 <h2>{{ titre }}</h2>
-<table>
+
+<table class="tbl">
+  <!-- Largeurs des colonnes (somme = 100%) -->
+  <colgroup>
+    <col style="width:4%;">   <!-- 1: N° (réduit) -->
+    <col style="width:22%;">  <!-- 2: Nom (agrandi) -->
+    <col style="width:12%;">  <!-- 3: Matricule (réduit) -->
+    <col style="width:6%;">   <!-- 4: Sexe (réduit) -->
+    <col style="width:12%;">  <!-- 5: Date de naissance -->
+    <col style="width:12%;">  <!-- 6: Date décès -->
+    <col style="width:8%;">   <!-- 7: Âge décédé (réduit) -->
+    <col style="width:24%;">  <!-- 8: Entité -->
+  </colgroup>
+
   <thead>
     <tr>
       {% for col in colonnes %}
@@ -11,9 +68,19 @@
     {% for ligne in donnees %}
       <tr>
         {% for cellule in ligne %}
-           <td class="{% if forloop.counter0 == 1 or forloop.counter0 == 7 %}left{% endif %}">{{ cellule }}</td>
+          <td>{{ cellule|default:"-" }}</td>
         {% endfor %}
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="{{ colonnes|length }}" style="text-align:center;">Aucune donnée disponible.</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- ✅ Footer d'impression réutilisable -->
+{% include "personnel/_footer_impression.html" %}
+
+</body>
+</html>

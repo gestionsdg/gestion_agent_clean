@@ -2,88 +2,136 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ titre }}</title>
-    <style>
-        @media print {
-            .entite-col {
-                display: none !important;
-            }
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #aaa;
-            padding: 6px;
-            font-size: 13px;
-        }
-        th {
-            text-align: center;
-            background-color: #f0f0f0;
-        }
-        td.center {
-            text-align: center;
-        }
-        td.left {
-            text-align: left;
-        }
-        h2 {
-            text-align: center;
-			text-decoration: underline;
-            margin-bottom: 10px;
-        }
-        .highlight-age {
-            background-color: #d0e7ff !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>{{ titre }}</title>
+  <style>
+    /* PDF A4 paysage avec marges */
+    @page { size: A4 landscape; margin: 12mm; }
+
+    /* Espace pour le footer fixé */
+    body { padding-bottom: 40px; }
+
+    /* Table fixe pour respecter les largeurs de <col> */
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; table-layout: fixed; }
+    th, td { border: 1px solid #aaa; padding: 6px; font-size: 12px; line-height: 1.2; vertical-align: top; }
+    th { text-align: center; background-color: #f0f0f0; }
+
+    td.center { text-align: center; }
+    td.left   { text-align: left; }
+
+    /* ========= Largeurs (mm) ========= */
+    col.col-num        { width: 12mm; }
+    col.col-nom        { width: 51mm; }
+    col.col-matricule  { width: 18mm; }
+    col.col-grade      { width: 34mm; }
+    col.col-sexe       { width: 12mm; }
+    col.col-fonction   { width: 51mm; }
+    col.col-naissance  { width: 25mm; }
+    col.col-age        { width: 16mm; }
+    col.col-affect     { width: 24mm; }
+    col.col-duree      { width: 35mm; }
+    col.col-entite     { width: 26mm; }
+
+    .wrap   { white-space: normal; overflow-wrap: anywhere; word-break: break-word; hyphens: auto; }
+    .nowrap { white-space: nowrap; word-break: keep-all; }
+
+    th.col-matricule,
+    th.col-sexe,
+    th.col-naissance,
+    th.col-affect,
+    th.col-duree {
+      font-size: 11px;
+      line-height: 1.15;
+      padding: 5px 4px;
+    }
+
+    tbody tr.highlight-age td { background-color: #d0e7ff !important; }
+
+    @media print { .entite-col { display: none !important; } }
+
+    /* ====== En-tête ====== */
+    h2 {
+      text-align: center;
+      font-size: 22px;          /* ✅ taille augmentée */
+      text-decoration: none;    /* ✅ retrait du soulignement */
+      margin: 0;
+    }
+
+    hr.trait-bleu {
+      border: none;
+      height: 1.5px;
+      background-color: #1F497D;
+      margin: 10px 0 20px 0;
+    }
+  </style>
 </head>
 <body>
-    <h2>{{ titre|safe }}</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>N°</th>
-                <th>Nom</th>
-                <th>Matricule</th>
-                <th>Grade actuel</th>
-                <th>Sexe</th>
-                <th>Fonction</th>
-                <th>Date naissance</th>
-                <th>Âge</th>
-                <th>Date affectation</th>
-                <th>Durée affectation</th>
-                <th class="entite-col">Entité</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in donnees %}
-            <tr {% if item.7|add:0 >= 55 %}class="highlight-age"{% endif %}>
-                <td class="center">{{ item.0 }}</td>
-                <td class="left">{{ item.1 }}</td>
-                <td class="center">{{ item.2 }}</td>
-                <td class="left">{{ item.3 }}</td>
-                <td class="center">{{ item.4 }}</td>
-                <td class="left">{{ item.5 }}</td>
-                <td class="center">{{ item.6 }}</td>
-                <td class="center">
-                    {% if item.7 != '-' %}
-                        {{ item.7 }} an{% if item.7 > 1 %}s{% endif %}
-                    {% else %}-{% endif %}
-                </td>
-                <td class="center">{{ item.8 }}</td>
-                <td class="center">
-                    {% if item.9 != '-' %}
-                        {{ item.9 }} an{% if item.9 > 1 %}s{% endif %}
-                    {% else %}-{% endif %}
-                </td>
-                <td class="entite-col left">{{ item.10 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <!-- ✅ Logo au-dessus du titre (gauche) -->
+  <div style="margin-bottom: 8px; text-align: left;">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS" style="height: 80px; display: block;">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; display: block;">
+    {% endif %}
+  </div>
+
+  <!-- ✅ Titre centré -->
+  <h2>{{ titre|safe }}</h2>
+
+  <!-- ✅ Trait bleu foncé sous le titre -->
+  <hr class="trait-bleu">
+
+  <table>
+    <colgroup>
+      <col class="col-num" />
+      <col class="col-nom" />
+      <col class="col-matricule" />
+      <col class="col-grade" />
+      <col class="col-sexe" />
+      <col class="col-fonction" />
+      <col class="col-naissance" />
+      <col class="col-age" />
+      <col class="col-affect" />
+      <col class="col-duree" />
+      <col class="col-entite" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th class="wrap">Nom</th>
+        <th class="wrap col-matricule">Matricule</th>
+        <th class="wrap">Grade actuel</th>
+        <th class="wrap col-sexe">Sexe</th>
+        <th class="wrap">Fonction</th>
+        <th class="wrap col-naissance">Date<br>naissance</th>
+        <th class="nowrap">Âge</th>
+        <th class="wrap col-affect">Date<br>affectation</th>
+        <th class="wrap col-duree">Durée<br>affectation</th>
+        <th class="wrap entite-col">Entité</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in donnees %}
+      <tr class="{% if r.senior %}highlight-age{% endif %}">
+        <td class="center">{{ r.numero }}</td>
+        <td class="left wrap">{{ r.nom }}</td>
+        <td class="center nowrap">{{ r.matricule }}</td>
+        <td class="left wrap">{{ r.grade }}</td>
+        <td class="center">{{ r.sexe }}</td>
+        <td class="left wrap">{{ r.fonction }}</td>
+        <td class="center nowrap">{{ r.date_naissance }}</td>
+        <td class="center nowrap">{{ r.age }}</td>
+        <td class="center nowrap">{{ r.date_affectation }}</td>
+        <td class="center wrap">{{ r.duree_affectation }}</td>
+        <td class="left wrap entite-col">{{ r.entite }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ✅ Footer d'impression réutilisable -->
+  {% include "personnel/_footer_impression.html" %}
+
 </body>
 </html>

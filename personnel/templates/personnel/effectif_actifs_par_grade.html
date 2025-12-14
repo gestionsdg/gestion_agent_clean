@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ titre }}</title>
+  <style>
+    /* ====== Mise en page (écran) ====== */
+    body { font-family: Arial, sans-serif; margin: 12px; color:#111; }
+
+    .page {
+      width: 100%;
+      max-width: calc(210mm - 24mm);
+      margin: 0 auto;
+      padding: 0 12mm;
+      box-sizing: border-box;
+    }
+
+    /* En-tête */
+    .logo-top { margin-bottom: 8px; text-align: left; }
+    .logo-top img { height: 80px; display: block; }
+
+    h1 { text-align:center; text-decoration: underline; margin: 0; font-size: 22px; }
+
+    .trait-bleu {
+      border: none;
+      height: 1.5px;
+      background-color: #1F497D;
+      margin: 10px 0 20px 0;
+    }
+
+    .actions { text-align: right; margin: 8px 0 12px 0; }
+
+    .btn {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px solid #0b5ed7;
+      border-radius: 6px;
+      background-color: #0d6efd;
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .btn:hover, .btn:focus { background-color: #0b5ed7; border-color: #0a58ca; }
+
+    table { width:100%; border-collapse: collapse; table-layout: fixed; }
+    th, td { border:1px solid #aaa; padding:6px; }
+    th { text-align:center; background:#f0f0f0; }
+
+    td.num { text-align:center; width:30px; }
+    .col-grade { width:90px; }
+    .col-eff   { width:50px; }
+
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+
+    tfoot td { font-weight:bold; }
+
+    /* ===== Impression ===== */
+    @media print {
+      @page { size: A4 portrait; margin: 14mm; }
+      body { margin: 0; }
+      .actions { display: none; }
+      .page { max-width: none; padding: 0; }
+      th, td { padding: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ✅ Logo au-dessus du titre (gauche) -->
+    <div class="logo-top">
+      {% if logo_b64 %}
+        <img src="{{ logo_b64 }}" alt="Logo CNSS">
+      {% else %}
+        <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS">
+      {% endif %}
+    </div>
+
+    <!-- ✅ Titre centré -->
+    <h1>{{ titre }}</h1>
+
+    <!-- ✅ Trait bleu foncé fin sous le titre -->
+    <hr class="trait-bleu">
+
+    {% url 'personnel:effectif_actifs_par_grade_pdf' as pdf_ns %}
+    {% url 'effectif_actifs_par_grade_pdf' as pdf_plain %}
+    <div class="actions">
+      <a class="btn" href="{% firstof pdf_ns pdf_plain %}" target="_blank" rel="noopener">🖨️ Imprimer en PDF</a>
+    </div>
+
+    <table>
+      <colgroup>
+        <col style="width:30px;">
+        <col class="col-grade">
+        <col class="col-eff">
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th style="width:30px;">N°</th>
+          <th class="text-center col-grade">Grade</th>
+          <th class="col-eff">Effectif (actif)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <!-- Numérotation fiable -->
+          <td class="num">{{ forloop.counter }}</td>
+
+          <!-- Grade : couvre dict (grade/libelle/nom) et tuple (row.0) -->
+          <td class="text-left col-grade">
+            {% firstof row.grade row.libelle row.nom row.0 "—" %}
+          </td>
+
+          <!-- Effectif : couvre dict (total/effectif/count/nbr/n)
+               et tuple (row.1). -->
+          <td class="num col-eff">
+            {% firstof row.total row.effectif row.count row.nbr row.n row.1 0 %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center">Aucune donnée à afficher.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td></td>
+          <td class="text-center">Total général</td>
+          <td class="num col-eff">{{ total_general }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</body>
+</html>

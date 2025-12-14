@@ -1,17 +1,65 @@
+{% load static %} 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <style>
+    @page { size: A4 landscape; margin: 1cm; }
+
     body {
       font-family: "DejaVu Sans", sans-serif;
       font-size: 12px;
+      padding-bottom: 50px; /* espace pour le footer si besoin */
     }
+
+    /* ===== Titres ===== */
     h2 {
       text-align: center;
-      text-decoration: underline;
-      margin-bottom: 15px;
+      font-size: 22px;
+      text-decoration: none;
+      margin: 0;
     }
+
+    hr.trait-bleu {
+      border: none;
+      height: 1.5px;
+      background-color: #1F497D;
+      margin: 10px 0 20px 0;
+    }
+
+    /* ===== Barre d’actions (non imprimée) ===== */
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0 6px 0;
+    }
+    .left-actions, .right-actions { display: flex; gap: 8px; align-items: center; }
+
+    .btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      border: 1px solid #1F497D;
+      border-radius: 6px;
+      background: #1F497D;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700; /* texte blanc gras */
+      text-decoration: none; /* pour <a> */
+      display: inline-block; /* pour <a> */
+    }
+    .btn:hover { opacity: .9; }
+
+    .filter-select {
+      padding: 6px 8px;
+      font-size: 12px;
+      border: 1px solid #999;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    /* ===== Tableau ===== */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -20,52 +68,118 @@
     th, td {
       border: 1px solid #444;
       padding: 5px;
-      text-align: center; /* Centrage général pour uniformité */
+      text-align: center;
     }
     th {
       background-color: #f0f0f0;
       font-weight: bold;
     }
-    td.left {
-      text-align: left;
-    }
-    .highlight-blue {
-      background-color: #87CEEB;
+    td.left { text-align: left; }
+
+    /* ✅ Masquer la colonne Catégorie dans le PDF (media print) */
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .actions { display: none !important; } /* on masque les actions à l’impression */
+      th.col-categorie, td.col-categorie { display: none !important; }
     }
   </style>
 </head>
 <body>
 
-<h2>Liste des Cadres et Agents retraitables</h2>
+  <!-- Logo -->
+  <div style="margin-bottom: 8px; text-align: left;">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS" style="height: 80px; display: block;">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; display: block;">
+    {% endif %}
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>N°</th>
-      <th>Nom</th>
-      <th>Matricule</th>
-      <th>Grade actuel</th>
-      <th>Sexe</th>
-      <th>Date de naissance</th>
-      <th>Âge</th>
-      <th>Entité</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for emp in retraitables %}
-    <tr {% if emp.highlight %}class="highlight-blue"{% endif %}>
-      <td>{{ forloop.counter }}</td>
-      <td class="left">{{ emp.nom }}</td>
-      <td>{{ emp.matricule }}</td>
-      <td class="left">{{ emp.grade }}</td>
-      <td>{{ emp.sexe }}</td>
-      <td>{{ emp.date_naissance|date:"d/m/Y" }}</td>
-      <td>{{ emp.age_str }}</td>
-      <td class="left">{{ emp.entite }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- ===== Titre DYNAMIQUE côté serveur (pas de JS) =====
+       Utilise 'titre' si fourni, sinon choisit selon 'categorie'. -->
+  <h2 id="page-title">
+    {% if titre %}
+      {{ titre }}
+    {% else %}
+      {% if categorie == "dans_5_ans" %}
+        Liste des Cadres et Agents retraitables dans cinq ans
+      {% elif categorie == "dans_4_ans" %}
+        Liste des Cadres et Agents retraitables dans quatre ans
+      {% elif categorie == "dans_3_ans" %}
+        Liste des Cadres et Agents retraitables dans trois ans
+      {% elif categorie == "dans_2_ans" %}
+        Liste des Cadres et Agents retraitables dans deux ans
+      {% elif categorie == "dans_1_an" %}
+        Liste des Cadres et Agents retraitables dans une année
+      {% elif categorie == "annee_en_cours" %}
+        Liste des Cadres et Agents retraitables pour l’année en cours
+      {% else %}
+        Liste des Cadres et Agents retraitables
+      {% endif %}
+    {% endif %}
+  </h2>
+
+  <hr class="trait-bleu">
+
+  <!-- Barre d’actions (masquée à l’impression) -->
+  <div class="actions">
+    <div class="left-actions">
+      <!-- Bouton Retour à la liste -->
+      <a href="{% url 'personnel:liste_retraitables_page' %}" class="btn">⬅ Retour à la liste</a>
+    </div>
+    <div class="right-actions">
+      <button class="btn" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>Nom</th>
+        <th>Matricule</th>
+        <th>Grade actuel</th>
+        <th>Sexe</th>
+        <th>Date de naissance</th>
+        <th>Âge</th>
+        <!-- ✅ NOUVELLE COLONNE -->
+        <th>Date départ en retraite</th>
+        <th>Entité</th>
+        <th class="col-categorie">Catégorie</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in retraitables %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td class="left">{{ emp.nom }}</td>
+        <td>{{ emp.matricule }}</td>
+        <td class="left">{{ emp.grade }}</td>
+        <td>{{ emp.sexe }}</td>
+        <td>{{ emp.date_naissance|date:"d/m/Y" }}</td>
+        <td>{{ emp.age_str }}</td>
+        <!-- ✅ Affiche la date +65 ans, sinon "-" -->
+        <td>
+          {% if emp.date_depart_retraite %}
+            {{ emp.date_depart_retraite|date:"d/m/Y" }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td class="left">{{ emp.entite }}</td>
+        <td class="col-categorie">{{ emp.categorie }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <!-- ✅ +1 colonne → colspan passe à 10 -->
+        <td colspan="10">Aucune donnée disponible.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Footer (optionnel) #}
+  {# {% include "personnel/_footer_impression.html" %} #}
 
 </body>
 </html>

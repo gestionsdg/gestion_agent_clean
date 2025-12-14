@@ -1,38 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}{{ titre }}{% endblock %}
+
 {% block content %}
-<h2 style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">
-  Liste des agents retraités
+<h2 style="text-align: center; font-size: 20px; margin-bottom: 10px; text-decoration: underline; font-weight: bold;">
+  {{ titre }}
 </h2>
 
-<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+<table class="tbl">
   <thead>
     <tr>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 70px;">Date de naissance</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 80px;">Date départ retraite</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Âge départ</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center; width: 70px;">Date engagement</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Carrière</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: left; width: 200px;">Entité</th>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Matricule</th>
+      <th>Grade actuel</th>   {# ✅ Nouvelle colonne #}
+      <th>Sexe</th>
+      <th>Date naissance</th>
+      <th>Date retraite</th>
+      <th>Âge départ</th>
+      <th>Date engagement</th>
+      <th>Carrière</th>
+      <th>Entité</th>
     </tr>
   </thead>
   <tbody>
-    {% for num, emp in agents %}
-    <tr style="text-align: center;">
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ num }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.nom|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.matricule|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.sexe|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_naissance|date:"d/m/Y" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_statut|date:"d/m/Y" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.age_depart|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_engagement|date:"d/m/Y" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.carriere|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.entite|default:"-" }}</td>
-    </tr>
+    {% for idx, emp in agents %}
+      <tr>
+        <td>{{ idx }}</td>
+        <td class="left">{{ emp.nom|default:"-" }}</td>
+        <td>{{ emp.matricule|default:"-" }}</td>
+        <td class="left">{{ emp.grade_actuel|default:"-" }}</td>  {# ✅ Ajout de la donnée #}
+        <td>{{ emp.sexe|default:"-" }}</td>
+        <td>{{ emp.date_naissance|date:"d/m/Y"|default:"-" }}</td>
+        <td>{{ emp.date_statut|date:"d/m/Y"|default:"-" }}</td>
+        <td>{{ emp.age_depart|default:"-" }}</td>
+        <td>{{ emp.date_engagement|date:"d/m/Y"|default:"-" }}</td>
+        <td>{{ emp.carriere|default:"-" }}</td>
+        <td class="left">{{ emp.entite|default:"-" }}</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- ✅ Footer réutilisable, uniquement à l’impression -->
+{% include "personnel/_footer_impression.html" %}
+
+<style>
+  .tbl { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 12px; 
+    margin-top: 8px; 
+  }
+  .tbl th, 
+  .tbl td { 
+    border: 1px solid #000; 
+    padding: 6px; 
+    text-align: center; 
+  }
+  .tbl th { 
+    background: #f2f2f2; 
+    text-align: center;  /* ✅ centrage des titres */
+  }
+  .tbl td.left { 
+    text-align: left; 
+  }
+
+  /* ✅ Empêche les retours à la ligne dans la colonne “Carrière” (10e colonne) */
+  .tbl th:nth-child(10),
+  .tbl td:nth-child(10) {
+    white-space: nowrap;
+  }
+
+  thead { display: table-header-group; }
+  tbody tr { page-break-inside: avoid; }
+
+  /* WeasyPrint / impression navigateur */
+  @page { size: A4 landscape; margin: 1cm; }
+
+  /* ✅ Par défaut, ne pas afficher le footer à l’écran */
+  .footer-impression { display: none; }
+
+  @media print {
+    body { padding-bottom: 60px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .footer-impression { display: block; } /* ✅ visible seulement à l’impression */
+  }
+</style>
 {% endblock %}

@@ -1,81 +1,100 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        @page {
-            size: landscape;
-            margin: 1cm;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-        }
-        h2 {
-            text-align: center;
-            text-decoration: underline;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th {
-            border: 1px solid #444;
-            padding: 6px;
-            text-align: center;
-            background-color: #f2f2f2;
-        }
-        td {
-            border: 1px solid #444;
-            padding: 6px;
-        }
-        .center {
-            text-align: center;
-        }
-        .left {
-            text-align: left;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <style>
+    @page { size: A4 landscape; margin: 1cm; }
+    body { font-family: Arial, sans-serif; font-size: 13px; padding-bottom: 40px; }
+
+    /* ✅ Logo en haut à gauche (au-dessus du titre) */
+    .logo-top { margin-bottom: 6px; text-align: left; }
+    .logo-top img { max-height: 60px; display: block; }
+
+    /* ✅ Titre sous le logo, centré */
+    h2 {
+      margin: 4px 0 10px 0;
+      text-decoration: underline;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    /* Tableau */
+    table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    th, td { border: 1px solid #999 !important; padding: 6px; }
+    th { text-align: center; background-color: #B2E0F7 !important; }
+
+    .center { text-align: center; }
+    .left   { text-align: left; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; }
+      th { background-color: #ADD8E6 !important; }
+      th, td { border: 1px solid #999 !important; }
+    }
+  </style>
 </head>
 <body>
 
-<h2>{{ titre }}</h2>
+  <!-- ✅ Logo au-dessus -->
+  <div class="logo-top">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS">
+    {% endif %}
+  </div>
 
-<table>
+  <!-- ✅ Titre en dessous du logo -->
+  <h2>{{ titre }}</h2>
+
+  <table>
+    <!-- Largeurs des colonnes -->
+    <colgroup>
+      <col style="width:4%;">   <!-- 1: N° -->
+      <col style="width:16%;">  <!-- 2: Nom -->
+      <col style="width:8%;">   <!-- 3: Matricule -->
+      <col style="width:10%;">  <!-- 4: Grade -->
+      <col style="width:5%;">   <!-- 5: Sexe -->
+      <col style="width:11%;">  <!-- 6: Date engagement -->
+      <col style="width:11%;">  <!-- 7: Date licenciement -->
+      <col style="width:15%;">  <!-- 8: Carrière -->
+      <col style="width:16%;">  <!-- 9: Entité -->
+    </colgroup>
+
     <thead>
-        <tr>
-            {% for col in colonnes %}
-                <th>{{ col }}</th>
-            {% endfor %}
-        </tr>
+      <tr>
+        {% for col in colonnes %}
+          <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
     </thead>
     <tbody>
-        {% for item in donnees %}
+      {% for item in donnees %}
+        {% with n=item.0 nom=item.1 matricule=item.2 grade=item.3 sexe=item.4 d_eng=item.5 d_statut=item.6 carriere=item.7 entite=item.8 %}
         <tr>
-            {% for val in item %}
-                {% if forloop.counter == 8 %}
-                    <td class="center">
-                        {% if val|default:""|stringformat:"i" == "1" or val == 1 %}
-                            {{ val }} an
-                        {% elif val %}
-                            {{ val }} ans
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                {% elif forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 6 or forloop.counter == 7 %}
-                    <td class="center">{{ val|default:"-" }}</td>
-                {% else %}
-                    <td class="left">{{ val|default:"-" }}</td>
-                {% endif %}
-            {% endfor %}
+          <td class="center">{{ n|default:"-" }}</td>
+          <td class="left">{{ nom|default:"-" }}</td>
+          <td class="center">{{ matricule|default:"-" }}</td>
+          <td class="left">{{ grade|default:"-" }}</td>
+          <td class="center">{{ sexe|default:"-" }}</td>
+          <td class="center">{{ d_eng|default:"-" }}</td>
+          <td class="center">{{ d_statut|default:"-" }}</td>
+          <td class="center">{{ carriere|default:"-" }}</td>
+          <td class="left">{{ entite|default:"-" }}</td>
         </tr>
-        {% endfor %}
+        {% endwith %}
+      {% empty %}
+        <tr><td class="center" colspan="{{ colonnes|length }}">Aucune donnée disponible.</td></tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+
+  <!-- ✅ Footer impression -->
+  {% include "personnel/_footer_impression.html" %}
 
 </body>
 </html>

@@ -1,117 +1,139 @@
-
+{% load static %}
 {% block content %}
-<h2 style="text-align: center;">{{ titre }}</h2>
+<!-- ✅ Logo au-dessus du titre (gauche) -->
+<div class="logo-top" style="margin-bottom: 8px; text-align: left;">
+  {% if logo_b64 %}
+    <img src="{{ logo_b64 }}" alt="Logo CNSS" style="height: 80px; display: block;">
+  {% else %}
+    <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; display: block;">
+  {% endif %}
+</div>
+
+<h2 style="text-align: center; margin: 0;"><u>{{ titre }}</u></h2>
+
+<!-- ✅ Trait bleu foncé sous le titre -->
+<hr class="trait-bleu" style="border: none; height: 1.5px; background-color: #1F497D; margin: 10px 0 16px 0;">
 
 <!-- FORMULAIRE DE SÉLECTION D'ENTITÉ -->
 <form method="get" style="text-align: center; margin-bottom: 15px;">
     <label for="entite">Filtrer par entité :</label>
-    <select name="entite" id="entite" onchange="this.form.submit()" style="padding: 5px; font-size: 13px;">
-<option value="Antenne d'Aru" {% if entite_choisie == "Antenne d'Aru" %}selected{% endif %}>Antenne d'Aru</option>
-<option value="Antenne de Beni" {% if entite_choisie == "Antenne de Beni" %}selected{% endif %}>Antenne de Beni</option>
-<option value="Antenne de Bumba" {% if entite_choisie == "Antenne de Bumba" %}selected{% endif %}>Antenne de Bumba</option>
-<option value="Antenne de Dilolo" {% if entite_choisie == "Antenne de Dilolo" %}selected{% endif %}>Antenne de Dilolo</option>
-<option value="Antenne de Fizi" {% if entite_choisie == "Antenne de Fizi" %}selected{% endif %}>Antenne de Fizi</option>
-<option value="Antenne de Gungu" {% if entite_choisie == "Antenne de Gungu" %}selected{% endif %}>Antenne de Gungu</option>
-<option value="Antenne de Kabare" {% if entite_choisie == "Antenne de Kabare" %}selected{% endif %}>Antenne de Kabare</option>
-<option value="Antenne de Kalima" {% if entite_choisie == "Antenne de Kalima" %}selected{% endif %}>Antenne de Kalima</option>
-<option value="Antenne de Kasenga" {% if entite_choisie == "Antenne de Kasenga" %}selected{% endif %}>Antenne de Kasenga</option>
-<option value="Antenne de Kipushi" {% if entite_choisie == "Antenne de Kipushi" %}selected{% endif %}>Antenne de Kipushi</option>
-<option value="Antenne de Masisi" {% if entite_choisie == "Antenne de Masisi" %}selected{% endif %}>Antenne de Masisi</option>
-<option value="Antenne de Muanda" {% if entite_choisie == "Antenne de Muanda" %}selected{% endif %}>Antenne de Muanda</option>
-<option value="Antenne de Mweka" {% if entite_choisie == "Antenne de Mweka" %}selected{% endif %}>Antenne de Mweka</option>
-<option value="Antenne de Pweto" {% if entite_choisie == "Antenne de Pweto" %}selected{% endif %}>Antenne de Pweto</option>
-<option value="Antenne de Rutshuru" {% if entite_choisie == "Antenne de Rutshuru" %}selected{% endif %}>Antenne de Rutshuru</option>
-<option value="Antenne de Sandoa" {% if entite_choisie == "Antenne de Sandoa" %}selected{% endif %}>Antenne de Sandoa</option>
-<option value="Antenne de Tshimbulu" {% if entite_choisie == "Antenne de Tshimbulu" %}selected{% endif %}>Antenne de Tshimbulu</option>
-<option value="Antenne de Watsa" {% if entite_choisie == "Antenne de Watsa" %}selected{% endif %}>Antenne de Watsa</option>
-<option value="Antenne d'Idiofa" {% if entite_choisie == "Antenne d'Idiofa" %}selected{% endif %}>Antenne d'Idiofa</option>
-<option value="Bureau de Boende" {% if entite_choisie == "Bureau de Boende" %}selected{% endif %}>Bureau de Boende</option>
-<option value="Bureau de Buta" {% if entite_choisie == "Bureau de Buta" %}selected{% endif %}>Bureau de Buta</option>
-<option value="Bureau de Butembo" {% if entite_choisie == "Bureau de Butembo" %}selected{% endif %}>Bureau de Butembo</option>
-<option value="Bureau de Gbadolite" {% if entite_choisie == "Bureau de Gbadolite" %}selected{% endif %}>Bureau de Gbadolite</option>
-<option value="Bureau de Gemena" {% if entite_choisie == "Bureau de Gemena" %}selected{% endif %}>Bureau de Gemena</option>
-<option value="Bureau de Kabinda" {% if entite_choisie == "Bureau de Kabinda" %}selected{% endif %}>Bureau de Kabinda</option>
-<option value="Bureau de Kasaji" {% if entite_choisie == "Bureau de Kasaji" %}selected{% endif %}>Bureau de Kasaji</option>
-<option value="Bureau de Lisala" {% if entite_choisie == "Bureau de Lisala" %}selected{% endif %}>Bureau de Lisala</option>
-<option value="Bureau de Lodja" {% if entite_choisie == "Bureau de Lodja" %}selected{% endif %}>Bureau de Lodja</option>
-<option value="Bureau de Mwene-Ditu" {% if entite_choisie == "Bureau de Mwene-Ditu" %}selected{% endif %}>Bureau de Mwene-Ditu</option>
-<option value="Bureau de Tshikapa" {% if entite_choisie == "Bureau de Tshikapa" %}selected{% endif %}>Bureau de Tshikapa</option>
-<option value="Bureau d'Ilebo" {% if entite_choisie == "Bureau d'Ilebo" %}selected{% endif %}>Bureau d'Ilebo</option>
-<option value="Bureau d'Inongo" {% if entite_choisie == "Bureau d'Inongo" %}selected{% endif %}>Bureau d'Inongo</option>
-<option value="Bureau d'Isiro" {% if entite_choisie == "Bureau d'Isiro" %}selected{% endif %}>Bureau d'Isiro</option>
-<option value="Centre Médical Matonge" {% if entite_choisie == "Centre Médical Matonge" %}selected{% endif %}>Centre Médical Matonge</option>
-<option value="Collège d’Experts" {% if entite_choisie == "Collège d’Experts" %}selected{% endif %}>Collège d’Experts</option>
-<option value="Corps de Surveillance" {% if entite_choisie == "Corps de Surveillance" %}selected{% endif %}>Corps de Surveillance</option>
-<option value="CP Commerce/Duk-Nord" {% if entite_choisie == "CP Commerce/Duk-Nord" %}selected{% endif %}>CP Commerce/Duk-Nord</option>
-<option value="CP Kimbanseke/Duk-Est" {% if entite_choisie == "CP Kimbanseke/Duk-Est" %}selected{% endif %}>CP Kimbanseke/Duk-Est</option>
-<option value="CP Kinshasa/Duk-Centre" {% if entite_choisie == "CP Kinshasa/Duk-Centre" %}selected{% endif %}>CP Kinshasa/Duk-Centre</option>
-<option value="CP Lemba/Duk-Sud" {% if entite_choisie == "CP Lemba/Duk-Sud" %}selected{% endif %}>CP Lemba/Duk-Sud</option>
-<option value="CP Makala/Duk-Centre" {% if entite_choisie == "CP Makala/Duk-Centre" %}selected{% endif %}>CP Makala/Duk-Centre</option>
-<option value="CP Révolution/Duk-Nord" {% if entite_choisie == "CP Révolution/Duk-Nord" %}selected{% endif %}>CP Révolution/Duk-Nord</option>
-<option value="Dir. de la Gestion Imm-Est" {% if entite_choisie == "Dir. de la Gestion Imm-Est" %}selected{% endif %}>Dir. de la Gestion Imm-Est</option>
-<option value="Dir. de la Gestion Imm-Ouest" {% if entite_choisie == "Dir. de la Gestion Imm-Ouest" %}selected{% endif %}>Dir. de la Gestion Imm-Ouest</option>
-<option value="Dir. des Etudes et Organisation" {% if entite_choisie == "Dir. des Etudes et Organisation" %}selected{% endif %}>Dir. des Etudes et Organisation</option>
-<option value="Dir. des Ressources Humaines" {% if entite_choisie == "Dir. des Ressources Humaines" %}selected{% endif %}>Dir. des Ressources Humaines</option>
-<option value="Dir. Urbaine de Kin Centre-Ouest" {% if entite_choisie == "Dir. Urbaine de Kin Centre-Ouest" %}selected{% endif %}>Dir. Urbaine de Kin Centre-Ouest</option>
-<option value="Dir. Urbaine de Kin Nord-Est" {% if entite_choisie == "Dir. Urbaine de Kin Nord-Est" %}selected{% endif %}>Dir. Urbaine de Kin Nord-Est</option>
-<option value="Dir. Urbaine de Kin Sud-Est" {% if entite_choisie == "Dir. Urbaine de Kin Sud-Est" %}selected{% endif %}>Dir. Urbaine de Kin Sud-Est</option>
-<option value="Dir. Urbaine de Kin-Centre" {% if entite_choisie == "Dir. Urbaine de Kin-Centre" %}selected{% endif %}>Dir. Urbaine de Kin-Centre</option>
-<option value="Dir. Urbaine de Kin-Est" {% if entite_choisie == "Dir. Urbaine de Kin-Est" %}selected{% endif %}>Dir. Urbaine de Kin-Est</option>
-<option value="Dir. Urbaine de Kin-Nord" {% if entite_choisie == "Dir. Urbaine de Kin-Nord" %}selected{% endif %}>Dir. Urbaine de Kin-Nord</option>
-<option value="Dir. Urbaine de Kin-Ouest" {% if entite_choisie == "Dir. Urbaine de Kin-Ouest" %}selected{% endif %}>Dir. Urbaine de Kin-Ouest</option>
-<option value="Dir. Urbaine de Kin-Sud" {% if entite_choisie == "Dir. Urbaine de Kin-Sud" %}selected{% endif %}>Dir. Urbaine de Kin-Sud</option>
-<option value="Direction de Formation" {% if entite_choisie == "Direction de Formation" %}selected{% endif %}>Direction de Formation</option>
-<option value="Direction de l'Action San et Soc" {% if entite_choisie == "Direction de l'Action San et Soc" %}selected{% endif %}>Direction de l'Action San et Soc</option>
-<option value="Direction de l'Audit Interne" {% if entite_choisie == "Direction de l'Audit Interne" %}selected{% endif %}>Direction de l'Audit Interne</option>
-<option value="Direction de Prévention" {% if entite_choisie == "Direction de Prévention" %}selected{% endif %}>Direction de Prévention</option>
-<option value="Direction de Recouvrement" {% if entite_choisie == "Direction de Recouvrement" %}selected{% endif %}>Direction de Recouvrement</option>
-<option value="Direction des Services Généraux" {% if entite_choisie == "Direction des Services Généraux" %}selected{% endif %}>Direction des Services Généraux</option>
-<option value="Direction Financière" {% if entite_choisie == "Direction Financière" %}selected{% endif %}>Direction Financière</option>
-<option value="Direction Juridique" {% if entite_choisie == "Direction Juridique" %}selected{% endif %}>Direction Juridique</option>
-<option value="Direction Technique" {% if entite_choisie == "Direction Technique" %}selected{% endif %}>Direction Technique</option>
-<option value="DP Bandundu" {% if entite_choisie == "DP Bandundu" %}selected{% endif %}>DP Bandundu</option>
-<option value="DP Boma" {% if entite_choisie == "DP Boma" %}selected{% endif %}>DP Boma</option>
-<option value="DP Bukavu" {% if entite_choisie == "DP Bukavu" %}selected{% endif %}>DP Bukavu</option>
-<option value="DP Bunia" {% if entite_choisie == "DP Bunia" %}selected{% endif %}>DP Bunia</option>
-<option value="DP Goma" {% if entite_choisie == "DP Goma" %}selected{% endif %}>DP Goma</option>
-<option value="DP Kamina" {% if entite_choisie == "DP Kamina" %}selected{% endif %}>DP Kamina</option>
-<option value="DP Kananga" {% if entite_choisie == "DP Kananga" %}selected{% endif %}>DP Kananga</option>
-<option value="DP Kasumbalesa" {% if entite_choisie == "DP Kasumbalesa" %}selected{% endif %}>DP Kasumbalesa</option>
-<option value="DP Kikwit" {% if entite_choisie == "DP Kikwit" %}selected{% endif %}>DP Kikwit</option>
-<option value="DP Kisangani" {% if entite_choisie == "DP Kisangani" %}selected{% endif %}>DP Kisangani</option>
-<option value="DP Kolwezi" {% if entite_choisie == "DP Kolwezi" %}selected{% endif %}>DP Kolwezi</option>
-<option value="DP Likasi" {% if entite_choisie == "DP Likasi" %}selected{% endif %}>DP Likasi</option>
-<option value="DP Lubumbashi" {% if entite_choisie == "DP Lubumbashi" %}selected{% endif %}>DP Lubumbashi</option>
-<option value="DP Maniema" {% if entite_choisie == "DP Maniema" %}selected{% endif %}>DP Maniema</option>
-<option value="DP Matadi" {% if entite_choisie == "DP Matadi" %}selected{% endif %}>DP Matadi</option>
-<option value="DP Mbandaka" {% if entite_choisie == "DP Mbandaka" %}selected{% endif %}>DP Mbandaka</option>
-<option value="DP Mbanza-Ngungu" {% if entite_choisie == "DP Mbanza-Ngungu" %}selected{% endif %}>DP Mbanza-Ngungu</option>
-<option value="DP Mbuji Mayi" {% if entite_choisie == "DP Mbuji Mayi" %}selected{% endif %}>DP Mbuji Mayi</option>
-<option value="DP Tanganyika" {% if entite_choisie == "DP Tanganyika" %}selected{% endif %}>DP Tanganyika</option>
-<option value="DP Uvira" {% if entite_choisie == "DP Uvira" %}selected{% endif %}>DP Uvira</option>
-<option value="Pompes Funèbres Pop" {% if entite_choisie == "Pompes Funèbres Pop" %}selected{% endif %}>Pompes Funèbres Pop</option>
-<option value="Secrétariat des Organes Statutaires" {% if entite_choisie == "Secrétariat des Organes Statutaires" %}selected{% endif %}>Secrétariat des Organes Statutaires</option>
-<option value="Secrétariat du DG" {% if entite_choisie == "Secrétariat du DG" %}selected{% endif %}>Secrétariat du DG</option>
-</select>
-<button id="btn-pdf" class="btn-imprimer">🖨️ Imprimer</button>
+    <select name="entite" id="entite" style="padding: 5px; font-size: 13px;">
+        <option value="">-- Choisir une entité --</option>
+        <option value="Antenne d'Aru" {% if entite_choisie == "Antenne d'Aru" %}selected{% endif %}>Antenne d'Aru</option>
+        <option value="Antenne de Beni" {% if entite_choisie == "Antenne de Beni" %}selected{% endif %}>Antenne de Beni</option>
+        <option value="Antenne de Bumba" {% if entite_choisie == "Antenne de Bumba" %}selected{% endif %}>Antenne de Bumba</option>
+        <option value="Antenne de Dilolo" {% if entite_choisie == "Antenne de Dilolo" %}selected{% endif %}>Antenne de Dilolo</option>
+        <option value="Antenne de Fizi" {% if entite_choisie == "Antenne de Fizi" %}selected{% endif %}>Antenne de Fizi</option>
+        <option value="Antenne de Gungu" {% if entite_choisie == "Antenne de Gungu" %}selected{% endif %}>Antenne de Gungu</option>
+        <option value="Antenne de Kabare" {% if entite_choisie == "Antenne de Kabare" %}selected{% endif %}>Antenne de Kabare</option>
+        <option value="Antenne de Kalima" {% if entite_choisie == "Antenne de Kalima" %}selected{% endif %}>Antenne de Kalima</option>
+        <option value="Antenne de Kasenga" {% if entite_choisie == "Antenne de Kasenga" %}selected{% endif %}>Antenne de Kasenga</option>
+        <option value="Antenne de Kipushi" {% if entite_choisie == "Antenne de Kipushi" %}selected{% endif %}>Antenne de Kipushi</option>
+        <option value="Antenne de Masisi" {% if entite_choisie == "Antenne de Masisi" %}selected{% endif %}>Antenne de Masisi</option>
+        <option value="Antenne de Muanda" {% if entite_choisie == "Antenne de Muanda" %}selected{% endif %}>Antenne de Muanda</option>
+        <option value="Antenne de Mweka" {% if entite_choisie == "Antenne de Mweka" %}selected{% endif %}>Antenne de Mweka</option>
+        <option value="Antenne de Pweto" {% if entite_choisie == "Antenne de Pweto" %}selected{% endif %}>Antenne de Pweto</option>
+        <option value="Antenne de Rutshuru" {% if entite_choisie == "Antenne de Rutshuru" %}selected{% endif %}>Antenne de Rutshuru</option>
+        <option value="Antenne de Sandoa" {% if entite_choisie == "Antenne de Sandoa" %}selected{% endif %}>Antenne de Sandoa</option>
+        <option value="Antenne de Tshimbulu" {% if entite_choisie == "Antenne de Tshimbulu" %}selected{% endif %}>Antenne de Tshimbulu</option>
+        <option value="Antenne de Watsa" {% if entite_choisie == "Antenne de Watsa" %}selected{% endif %}>Antenne de Watsa</option>
+        <option value="Antenne d'Idiofa" {% if entite_choisie == "Antenne d'Idiofa" %}selected{% endif %}>Antenne d'Idiofa</option>
+        <option value="Bureau de Boende" {% if entite_choisie == "Bureau de Boende" %}selected{% endif %}>Bureau de Boende</option>
+        <option value="Bureau de Buta" {% if entite_choisie == "Bureau de Buta" %}selected{% endif %}>Bureau de Buta</option>
+        <option value="Bureau de Butembo" {% if entite_choisie == "Bureau de Butembo" %}selected{% endif %}>Bureau de Butembo</option>
+        <option value="Bureau de Gbadolite" {% if entite_choisie == "Bureau de Gbadolite" %}selected{% endif %}>Bureau de Gbadolite</option>
+        <option value="Bureau de Gemena" {% if entite_choisie == "Bureau de Gemena" %}selected{% endif %}>Bureau de Gemena</option>
+        <option value="Bureau de Kabinda" {% if entite_choisie == "Bureau de Kabinda" %}selected{% endif %}>Bureau de Kabinda</option>
+        <option value="Bureau de Kasaji" {% if entite_choisie == "Bureau de Kasaji" %}selected{% endif %}>Bureau de Kasaji</option>
+        <option value="Bureau de Lisala" {% if entite_choisie == "Bureau de Lisala" %}selected{% endif %}>Bureau de Lisala</option>
+        <option value="Bureau de Lodja" {% if entite_choisie == "Bureau de Lodja" %}selected{% endif %}>Bureau de Lodja</option>
+        <option value="Bureau de Mwene-Ditu" {% if entite_choisie == "Bureau de Mwene-Ditu" %}selected{% endif %}>Bureau de Mwene-Ditu</option>
+        <option value="Bureau de Tshikapa" {% if entite_choisie == "Bureau de Tshikapa" %}selected{% endif %}>Bureau de Tshikapa</option>
+        <option value="Bureau d'Ilebo" {% if entite_choisie == "Bureau d'Ilebo" %}selected{% endif %}>Bureau d'Ilebo</option>
+        <option value="Bureau d'Inongo" {% if entite_choisie == "Bureau d'Inongo" %}selected{% endif %}>Bureau d'Inongo</option>
+        <option value="Bureau d'Isiro" {% if entite_choisie == "Bureau d'Isiro" %}selected{% endif %}>Bureau d'Isiro</option>
+        <option value="Centre Médical Matonge" {% if entite_choisie == "Centre Médical Matonge" %}selected{% endif %}>Centre Médical Matonge</option>
+        <option value="Collège d’Experts" {% if entite_choisie == "Collège d’Experts" %}selected{% endif %}>Collège d’Experts</option>
+        <option value="Corps de Surveillance" {% if entite_choisie == "Corps de Surveillance" %}selected{% endif %}>Corps de Surveillance</option>
+        <option value="CP Commerce/Duk-Nord" {% if entite_choisie == "CP Commerce/Duk-Nord" %}selected{% endif %}>CP Commerce/Duk-Nord</option>
+        <option value="CP Kimbanseke/Duk-Est" {% if entite_choisie == "CP Kimbanseke/Duk-Est" %}selected{% endif %}>CP Kimbanseke/Duk-Est</option>
+        <option value="CP Kinshasa/Duk-Centre" {% if entite_choisie == "CP Kinshasa/Duk-Centre" %}selected{% endif %}>CP Kinshasa/Duk-Centre</option>
+        <option value="CP Lemba/Duk-Sud" {% if entite_choisie == "CP Lemba/Duk-Sud" %}selected{% endif %}>CP Lemba/Duk-Sud</option>
+        <option value="CP Makala/Duk-Centre" {% if entite_choisie == "CP Makala/Duk-Centre" %}selected{% endif %}>CP Makala/Duk-Centre</option>
+        <option value="CP Révolution/Duk-Nord" {% if entite_choisie == "CP Révolution/Duk-Nord" %}selected{% endif %}>CP Révolution/Duk-Nord</option>
+        <option value="Dir. de la Gestion Imm-Est" {% if entite_choisie == "Dir. de la Gestion Imm-Est" %}selected{% endif %}>Dir. de la Gestion Imm-Est</option>
+        <option value="Dir. de la Gestion Imm-Ouest" {% if entite_choisie == "Dir. de la Gestion Imm-Ouest" %}selected{% endif %}>Dir. de la Gestion Imm-Ouest</option>
+        <option value="Dir. des Etudes et Organisation" {% if entite_choisie == "Dir. des Etudes et Organisation" %}selected{% endif %}>Dir. des Etudes et Organisation</option>
+        <option value="Dir. des Ressources Humaines" {% if entite_choisie == "Dir. des Ressources Humaines" %}selected{% endif %}>Dir. des Ressources Humaines</option>
+        <option value="Dir. Urbaine de Kin Centre-Ouest" {% if entite_choisie == "Dir. Urbaine de Kin Centre-Ouest" %}selected{% endif %}>Dir. Urbaine de Kin Centre-Ouest</option>
+        <option value="Dir. Urbaine de Kin Nord-Est" {% if entite_choisie == "Dir. Urbaine de Kin Nord-Est" %}selected{% endif %}>Dir. Urbaine de Kin Nord-Est</option>
+        <option value="Dir. Urbaine de Kin Sud-Est" {% if entite_choisie == "Dir. Urbaine de Kin Sud-Est" %}selected{% endif %}>Dir. Urbaine de Kin Sud-Est</option>
+        <option value="Dir. Urbaine de Kin-Centre" {% if entite_choisie == "Dir. Urbaine de Kin-Centre" %}selected{% endif %}>Dir. Urbaine de Kin-Centre</option>
+        <option value="Dir. Urbaine de Kin-Est" {% if entite_choisie == "Dir. Urbaine de Kin-Est" %}selected{% endif %}>Dir. Urbaine de Kin-Est</option>
+        <option value="Dir. Urbaine de Kin-Nord" {% if entite_choisie == "Dir. Urbaine de Kin-Nord" %}selected{% endif %}>Dir. Urbaine de Kin-Nord</option>
+        <option value="Dir. Urbaine de Kin-Ouest" {% if entite_choisie == "Dir. Urbaine de Kin-Ouest" %}selected{% endif %}>Dir. Urbaine de Kin-Ouest</option>
+        <option value="Dir. Urbaine de Kin-Sud" {% if entite_choisie == "Dir. Urbaine de Kin-Sud" %}selected{% endif %}>Dir. Urbaine de Kin-Sud</option>
+        <option value="Direction de Formation" {% if entite_choisie == "Direction de Formation" %}selected{% endif %}>Direction de Formation</option>
+        <option value="Direction de l'Action San et Soc" {% if entite_choisie == "Direction de l'Action San et Soc" %}selected{% endif %}>Direction de l'Action San et Soc</option>
+        <option value="Direction de l'Audit Interne" {% if entite_choisie == "Direction de l'Audit Interne" %}selected{% endif %}>Direction de l'Audit Interne</option>
+        <option value="Direction de Prévention" {% if entite_choisie == "Direction de Prévention" %}selected{% endif %}>Direction de Prévention</option>
+        <option value="Direction de Recouvrement" {% if entite_choisie == "Direction de Recouvrement" %}selected{% endif %}>Direction de Recouvrement</option>
+        <option value="Direction des Services Généraux" {% if entite_choisie == "Direction des Services Généraux" %}selected{% endif %}>Direction des Services Généraux</option>
+        <option value="Direction Financière" {% if entite_choisie == "Direction Financière" %}selected{% endif %}>Direction Financière</option>
+        <option value="Direction Juridique" {% if entite_choisie == "Direction Juridique" %}selected{% endif %}>Direction Juridique</option>
+        <option value="Direction Technique" {% if entite_choisie == "Direction Technique" %}selected{% endif %}>Direction Technique</option>
+        <option value="DP Bandundu" {% if entite_choisie == "DP Bandundu" %}selected{% endif %}>DP Bandundu</option>
+        <option value="DP Boma" {% if entite_choisie == "DP Boma" %}selected{% endif %}>DP Boma</option>
+        <option value="DP Bukavu" {% if entite_choisie == "DP Bukavu" %}selected{% endif %}>DP Bukavu</option>
+        <option value="DP Bunia" {% if entite_choisie == "DP Bunia" %}selected{% endif %}>DP Bunia</option>
+        <option value="DP Goma" {% if entite_choisie == "DP Goma" %}selected{% endif %}>DP Goma</option>
+        <option value="DP Kamina" {% if entite_choisie == "DP Kamina" %}selected{% endif %}>DP Kamina</option>
+        <option value="DP Kananga" {% if entite_choisie == "DP Kananga" %}selected{% endif %}>DP Kananga</option>
+        <option value="DP Kasumbalesa" {% if entite_choisie == "DP Kasumbalesa" %}selected{% endif %}>DP Kasumbalesa</option>
+        <option value="DP Kikwit" {% if entite_choisie == "DP Kikwit" %}selected{% endif %}>DP Kikwit</option>
+        <option value="DP Kisangani" {% if entite_choisie == "DP Kisangani" %}selected{% endif %}>DP Kisangani</option>
+        <option value="DP Kolwezi" {% if entite_choisie == "DP Kolwezi" %}selected{% endif %}>DP Kolwezi</option>
+        <option value="DP Likasi" {% if entite_choisie == "DP Likasi" %}selected{% endif %}>DP Likasi</option>
+        <option value="DP Lubumbashi" {% if entite_choisie == "DP Lubumbashi" %}selected{% endif %}>DP Lubumbashi</option>
+        <option value="DP Maniema" {% if entite_choisie == "DP Maniema" %}selected{% endif %}>DP Maniema</option>
+        <option value="DP Matadi" {% if entite_choisie == "DP Matadi" %}selected{% endif %}>DP Matadi</option>
+        <option value="DP Mbandaka" {% if entite_choisie == "DP Mbandaka" %}selected{% endif %}>DP Mbandaka</option>
+        <option value="DP Mbanza-Ngungu" {% if entite_choisie == "DP Mbanza-Ngungu" %}selected{% endif %}>DP Mbanza-Ngungu</option>
+        <option value="DP Mbuji Mayi" {% if entite_choisie == "DP Mbuji Mayi" %}selected{% endif %}>DP Mbuji Mayi</option>
+        <option value="DP Tanganyika" {% if entite_choisie == "DP Tanganyika" %}selected{% endif %}>DP Tanganyika</option>
+        <option value="DP Uvira" {% if entite_choisie == "DP Uvira" %}selected{% endif %}>DP Uvira</option>
+        <option value="Pompes Funèbres Pop" {% if entite_choisie == "Pompes Funèbres Pop" %}selected{% endif %}>Pompes Funèbres Pop</option>
+        <option value="Secrétariat des Organes Statutaires" {% if entite_choisie == "Secrétariat des Organes Statutaires" %}selected{% endif %}>Secrétariat des Organes Statutaires</option>
+        <option value="Secrétariat du DG" {% if entite_choisie == "Secrétariat du DG" %}selected{% endif %}>Secrétariat du DG</option>
+    </select>
+
+    <button type="submit" class="btn-imprimer" style="margin-left:8px;">🔎 Filtrer</button>
+
+    {% if entite_choisie %}
+      <a class="btn-imprimer" style="margin-left:8px; display:inline-block; text-decoration:none; padding:6px 12px; border-radius:4px;"
+         href="{% url 'personnel:liste_actifs_par_entite_pdf' %}?entite={{ entite_choisie|urlencode }}"
+         target="_blank">🖨️ Imprimer</a>
+    {% else %}
+      <span class="btn-imprimer btn-disabled" style="margin-left:8px; display:inline-block; padding:6px 12px; border-radius:4px;" title="Sélectionnez d'abord une entité">🖨️ Imprimer</span>
+    {% endif %}
 </form>
 
 <!-- BOUTONS ACTIONS -->
 <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
-    <a href="{% url 'liste_employes' %}">
+    <a href="{% url 'personnel:liste_employes' %}">
         <button class="btn-retour">⬅ Retour à la liste</button>
     </a>
-	<a href="{% url 'dashboard' %}">
+    <a href="{% url 'dashboard' %}">
         <button style="padding: 6px 12px; border: none; border-radius: 4px; background-color: #888; color: white; cursor: pointer;">
             ⬅ Retour au tableau de bord
         </button>
-	</a>
+    </a>
 
-    <form method="get" action="{% url 'liste_cadres_direction_pdf' %}" target="_blank" style="display: flex; gap: 6px; align-items: center;">
+    <form method="get" action="{% url 'personnel:liste_cadres_direction_pdf' %}" target="_blank" style="display: flex; gap: 6px; align-items: center;">
         <label for="entite">Cadres de Direction :</label>
         <select name="entite" required style="padding: 5px; font-size: 13px;">
             {% for e in entites %}
-                <option value="{{ e }}" {% if entite == e %}selected{% endif %}>{{ e }}</option>
+                <option value="{{ e }}" {% if entite_choisie == e %}selected{% endif %}>{{ e }}</option>
             {% endfor %}
         </select>
         <button type="submit" class="btn-imprimer">🖨️</button>
@@ -162,13 +184,18 @@
         color: white;
         cursor: pointer;
         font-size: 13px;
+        background-color: #007BFF;
     }
     .btn-retour {
         background-color: #888;
     }
-    .btn-imprimer {
-        background-color: #007BFF;
+    .btn-disabled {
+        opacity: .5;
+        pointer-events: none;
     }
+
+    /* Trait bleu foncé réutilisable si inline supprimé */
+    .trait-bleu { border: none; height: 1.5px; background-color: #1F497D; margin: 10px 0 16px 0; }
 
     @media print {
         .actions, form {
@@ -179,23 +206,4 @@
         }
     }
 </style>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const select = document.getElementById('entite');
-        const btnPDF = document.getElementById('btn-pdf');
-        const baseURL = "{% url 'liste_actifs_par_entite_pdf' %}";
-
-        btnPDF.addEventListener('click', function () {
-            const entite = select.value;
-            if (!entite) {
-                alert("Veuillez d'abord sélectionner une entité avant d'imprimer le PDF.");
-                return;
-            }
-
-            const url = `${baseURL}?entite=${encodeURIComponent(entite)}`;
-            window.open(url, '_blank');
-        });
-    });
-</script>
-
 {% endblock %}

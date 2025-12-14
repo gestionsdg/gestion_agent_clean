@@ -7,6 +7,7 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
+            padding-bottom: 40px; /* ✅ Espace pour le footer fixé */
         }
         h2 {
             text-align: center;
@@ -26,7 +27,7 @@
         /* Titres centrés */
         th {
            text-align: center;
-		   background-color: #d0e7f9; /* Bleu-ciel */
+           background-color: #d0e7f9; /* Bleu-ciel */
         }
         /* Colonnes centrées */
         .center {
@@ -70,5 +71,9 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- ✅ Footer d'impression réutilisable -->
+    {% include "personnel/_footer_impression.html" %}
+
 </body>
 </html>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}{{ titre }}{% endblock %}
 
 {% block content %}
 <!-- TITRE CENTRÉ ET SOULIGNÉ -->
@@ -6,22 +7,21 @@
     {{ titre }}
 </h2>
 
-<!-- BOUTONS ACTIONS : RETOUR À GAUCHE + IMPRIMER À DROITE -->
-<div class="actions" style="margin-bottom: 15px; display: flex; justify-content: space-between;">
-    <!-- Bouton Retour -->
-    <a href="{% url 'liste_employes' %}">
-        <button class="btn-retour" style="background-color: #ccc; color: black; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
-            ⬅ Retour à la liste
-        </button>
-    </a>
+<!-- BOUTONS ACTIONS : RETOUR À GAUCHE + PDF À DROITE -->
+<div class="actions" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+  <!-- Bouton Retour -->
+  <a href="{% url 'liste_employes' %}">
+    <button class="btn-retour" style="background-color: #ccc; color: black; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+      ⬅ Retour à la liste
+    </button>
+  </a>
 
-<!-- BOUTON PDF ALIGNÉ À DROITE + BLEU CIEL -->
-<div class="actions" style="margin-bottom: 15px; text-align: left;">
-    <a id="pdf-link" href="{% url 'liste_licencies_pdf' %}" target="_blank">
-        <button class="btn-imprimer" style="background-color: #87CEFA; color: black; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
-            🖨️ Imprimer en PDF
-        </button>
-    </a>
+  <!-- Bouton PDF -->
+  <a id="pdf-link" href="{% url 'liste_licencies_pdf' %}" target="_blank">
+    <button class="btn-imprimer" style="background-color: #87CEFA; color: black; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+      🖨️ Imprimer en PDF
+    </button>
+  </a>
 </div>
 
 <!-- TABLEAU DES LICENCIÉS -->
@@ -51,16 +51,37 @@
     {% endfor %}
   </tbody>
 </table>
-{% endblock %}
 
-<!-- FORMAT IMPRESSION EN PAYSAGE -->
+<!-- Élément "running" pour afficher UNIQUEMENT en DERNIÈRE page (WeasyPrint) -->
+<div class="print-stamp-last">Document imprimé : le {% now "d/m/Y H:i" %}</div>
+
+<!-- STYLES Impression : paysage + pied de page dernière page -->
 <style>
-    @media print {
-        @page {
-            size: landscape;
-        }
-        .btn-imprimer {
-            display: none;
-        }
+  /* Masquer le tampon à l'écran */
+  .print-stamp-last { display: none; }
+
+  @media print {
+    @page {
+      size: landscape;
+      margin: 20mm 15mm 20mm 15mm;
+      /* Par défaut, rien en pied de page */
+      @bottom-right { content: none; }
     }
+    /* Afficher le tampon uniquement sur la DERNIÈRE page (WeasyPrint) */
+    @page :last {
+      @bottom-right { content: element(doc_stamp); }
+    }
+
+    .actions, .btn-imprimer { display: none !important; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Élément "running" utilisé pour le pied de page WeasyPrint */
+    .print-stamp-last {
+      display: block;
+      position: running(doc_stamp);
+      height: 0; overflow: hidden;   /* ne prend pas de place dans le flux */
+      font-size: 11px; color: #555; text-align: right;
+    }
+  }
 </style>
+{% endblock %}

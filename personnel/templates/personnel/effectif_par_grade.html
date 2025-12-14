@@ -1,74 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Effectif des agents par grade</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { text-align: center; text-decoration: underline; }
-        table { width: 50%; margin: auto; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 5px; }
-        th { background-color: #d0e7f9; text-align: center; }
-        td.center { text-align: center; }
-        td.left { text-align: left; }
-        tfoot td { font-weight: bold; background-color: #f0f0f0; }
-        .form-container { text-align: center; margin-bottom: 20px; }
-        select, button { padding: 8px; font-size: 14px; }
-        .btn { background-color: #007bff; color: white; border: none; padding: 8px 15px; cursor: pointer; }
-        .btn-retour { background-color: #6c757d; margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Effectif des agents actifs par grade</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { text-align: center; text-decoration: underline; margin-bottom: 16px; }
+
+    .form-container { text-align: center; margin-bottom: 18px; }
+    select, button { padding: 8px; font-size: 14px; }
+    .btn { background-color: #007bff; color: white; border: none; padding: 8px 15px; cursor: pointer; }
+    .btn-retour { background-color: #6c757d; margin-left: 8px; }
+    .btn-print { background-color: #17a2b8; margin-left: 8px; }
+
+    /* ===== Tableau compact et lisible ===== */
+    table {
+      width: 55%;
+      max-width: 760px;
+      min-width: 520px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      font-size: 14px;
+      table-layout: fixed; /* respecte mieux les largeurs de colonnes */
+    }
+
+    /* Largeurs des colonnes via <colgroup> */
+    col.col-num   { width: 10%; }  /* N° resserré */
+    col.col-grade { width: 68%; }  /* ↓ Grade moins large */
+    col.col-eff   { width: 22%; }  /* Effectif un peu plus confortable */
+
+    th, td { border: 1px solid #ccc; padding: 6px; }
+    th { background-color: #d0e7f9; text-align: center; }
+    td.center { text-align: center; }
+    td.left { text-align: left; }
+    tfoot td { font-weight: bold; background-color: #f0f0f0; }
+
+    /* Ajustements pour écrans plus étroits */
+    @media (max-width: 1200px) {
+      table { width: 60%; }
+      col.col-num   { width: 12%; }
+      col.col-grade { width: 64%; }
+      col.col-eff   { width: 24%; }
+    }
+    @media (max-width: 900px) {
+      table { width: 90%; }
+      col.col-num   { width: 14%; }
+      col.col-grade { width: 58%; }
+      col.col-eff   { width: 28%; }
+    }
+  </style>
 </head>
 <body>
 
 <div class="form-container">
-    <form method="get" action="{% url 'effectif_detaille_par_grade' %}">
-        <select name="entite" required>
-            <option value="">-- Sélectionner une entité --</option>
-            {% for entite in entites %}
-                <option value="{{ entite }}" {% if entite == entite_choisie %}selected{% endif %}>{{ entite }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn">Afficher</button>
+  <form method="get" action="{% url 'personnel:effectif_detaille_par_grade' %}" style="display:inline-block;">
+    <select name="entite" required>
+      <option value="">-- Sélectionner une entité --</option>
+      {% for e in entites %}
+        <option value="{{ e }}" {% if e == entite_choisie %}selected{% endif %}>{{ e }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn">Afficher</button>
+  </form>
+
+  {% if entite_choisie %}
+    <form method="get" action="{% url 'personnel:effectif_detaille_par_grade_pdf' %}" target="_blank" style="display:inline-block;">
+      <input type="hidden" name="entite" value="{{ entite_choisie }}">
+      <button type="submit" class="btn btn-print">Imprimer PDF</button>
     </form>
+  {% endif %}
 
-    {% if entite_choisie %}
-        <form method="get" action="{% url 'effectif_detaille_par_grade_pdf' %}" target="_blank" style="margin-top: 10px;">
-            <input type="hidden" name="entite" value="{{ entite_choisie }}">
-            <button type="submit" class="btn">Imprimer PDF</button>
-        </form>
-    {% endif %}
-
-    <a href="{% url 'liste_employes' %}">
-        <button class="btn btn-retour">⬅ Retour à la liste des employés</button>
-    </a>
+  <a href="{% url 'personnel:liste_employes' %}">
+    <button type="button" class="btn btn-retour">⬅ Retour à la liste des employés</button>
+  </a>
 </div>
 
 {% if entite_choisie %}
-    <h2>{{ titre }}</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>N°</th>
-                <th>Grade actuel</th>
-                <th>Effectif</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ligne in data %}
-            <tr>
-                <td class="center">{{ ligne.numero }}</td>
-                <td class="left">{{ ligne.grade }}</td>
-                <td class="center">{{ ligne.effectif }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="2" class="center">Total général</td>
-                <td class="center">{{ total_general }}</td>
-            </tr>
-        </tfoot>
-    </table>
+  <h2>Effectif des Agents actifs par grade : {{ entite_choisie }}</h2>
+
+  <table>
+    <!-- Contrôle précis des largeurs -->
+    <colgroup>
+      <col class="col-num">
+      <col class="col-grade">
+      <col class="col-eff">
+    </colgroup>
+
+    <thead>
+      <tr><th>N°</th><th>Grade actuel</th><th>Effectif</th></tr>
+    </thead>
+    <tbody>
+      {% for ligne in data %}
+        <tr>
+          <td class="center">{{ ligne.numero|default:forloop.counter }}</td>
+          <td class="left">{{ ligne.grade }}</td>
+          <td class="center">{{ ligne.effectif }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="2" class="center">Total général</td><td class="center">{{ total_general }}</td></tr>
+    </tfoot>
+  </table>
 {% endif %}
 
 </body>

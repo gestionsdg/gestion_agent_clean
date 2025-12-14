@@ -1,42 +1,101 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Cadres de Direction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding-bottom: 40px;
+        }
+
+        /* ✅ Titre centré sans soulignement */
+        h2 {
+            font-size: 22px;               /* ← taille augmentée */
+            text-align: center;
+            margin: 0;
+            text-decoration: none;        /* ← suppression du soulignement */
+        }
+
+        /* ✅ Trait bleu foncé */
+        .trait-bleu {
+            border: none;
+            height: 1.5px;
+            background-color: #1F497D;
+            margin: 10px 0 20px 0;
+        }
+
+        /* ✅ Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+        }
+
+        th {
+            background-color: #e0e0e0;
+            text-align: center;
+        }
+
+        td.center { text-align: center; }
+        td.left { text-align: left; }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; font-size: 13px;">
+<body>
 
-    <h2 style="text-align: center;"><u>Les Cadres de Direction : {{ entite }}</u></h2>
+    <!-- ✅ Logo au-dessus du titre -->
+    <div style="margin-bottom: 8px; text-align: left;">
+        {% if logo_b64 %}
+            <img src="{{ logo_b64 }}" alt="Logo CNSS" style="height: 80px; display: block;">
+        {% else %}
+            <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; display: block;">
+        {% endif %}
+    </div>
 
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <!-- ✅ Titre centré -->
+    <h2>Les Cadres de Direction : {{ entite }}</h2>
+    <hr class="trait-bleu">
+
+    <!-- ✅ Tableau -->
+    <table>
         <thead>
-            <tr style="background-color: #e0e0e0;">
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Fonction</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date affectation</th>
-                <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Durée affectation</th>
-				<th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Âge</th>
+            <tr>
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Sexe</th>
+                <th>Fonction</th>
+                <th>Date affectation</th>
+                <th>Durée affectation</th>
+                <th>Âge</th>
             </tr>
         </thead>
         <tbody>
             {% for ligne in lignes %}
             <tr>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.0 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: left;">{{ ligne.1 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.2 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.4 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: left;">{{ ligne.5 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.6 }}</td>
-                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.7 }}</td>
-				<td style="border: 1px solid #ccc; padding: 5px; text-align: center;">{{ ligne.8 }}</td>
+                <td class="center">{{ ligne.0 }}</td>
+                <td class="left">{{ ligne.1 }}</td>
+                <td class="center">{{ ligne.2 }}</td>
+                <td class="center">{{ ligne.4 }}</td>
+                <td class="left">{{ ligne.5 }}</td>
+                <td class="center">{{ ligne.6 }}</td>
+                <td class="center">{{ ligne.7 }}</td>
+                <td class="center">{{ ligne.8 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- ✅ Footer impression -->
+    {% include "personnel/_footer_impression.html" %}
 
 </body>
 </html>

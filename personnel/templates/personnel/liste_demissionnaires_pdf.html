@@ -1,37 +1,82 @@
-
+{% extends 'base.html' %}
 {% block content %}
-<h2 style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">
-  Liste des agents démissionnaires
+<h2 style="text-align:center; font-weight:bold; text-decoration:underline; margin-bottom:14px;">
+  {{ titre }}
 </h2>
 
-<table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+<table class="tbl">
+  <!-- Largeur personnalisée -->
+  <colgroup>
+    <col style="width:4%;">   <!-- N° (réduit) -->
+    <col style="width:16%;">  <!-- Nom (un peu réduit) -->
+    <col style="width:12%;">  <!-- Matricule -->
+    <col style="width:12%;">  <!-- Grade actuel -->
+    <col style="width:5%;">   <!-- Sexe -->
+    <col style="width:10%;">  <!-- Date engagement -->
+    <col style="width:10%;">  <!-- Date démission -->
+    <col style="width:12%;">  <!-- Carrière -->
+    <col style="width:20%;">  <!-- Entité (agrandi) -->
+  </colgroup>
+
   <thead>
     <tr>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
-	  <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Grade actuel</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date engagement</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date démission</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Carrière</th>
-      <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Entité</th>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Matricule</th>
+      <th>Grade actuel</th>
+      <th>Sexe</th>
+      <th>Date engagement</th>
+      <th>Date démission</th>
+      <th>Carrière</th>
+      <th>Entité</th>
     </tr>
   </thead>
+
   <tbody>
     {% for num, emp in agents %}
     <tr>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ num }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.nom|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.matricule|default:"-" }}</td>
-	  <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.grade_actuel|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.sexe|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_engagement|date:"d/m/Y" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.date_statut|date:"d/m/Y" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ emp.carriere|default:"-" }}</td>
-      <td style="border: 1px solid #ccc; padding: 6px; text-align: left;">{{ emp.entite|default:"-" }}</td>
+      <td class="center">{{ num }}</td>
+      <td class="left">{{ emp.nom|default:"-" }}</td>
+      <td class="center">{{ emp.matricule|default:"-" }}</td>
+      <td class="left">{{ emp.grade_actuel|default:"-" }}</td>
+      <td class="center">{{ emp.sexe|default:"-" }}</td>
+      <td class="center">{{ emp.date_engagement|date:"d/m/Y" }}</td>
+      <td class="center">{{ emp.date_statut|date:"d/m/Y" }}</td>
+      <td class="center">{{ emp.carriere|default:"-" }}</td>
+      <td class="left">{{ emp.entite|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td class="center" colspan="9">Aucune donnée disponible.</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- ✅ Footer réutilisable : visible uniquement à l’impression -->
+{% include "personnel/_footer_impression.html" %}
+
+<style>
+  .tbl{ width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
+  thead{ display:table-header-group; }  /* répéter l'en-tête sur chaque page */
+  .tbl th, .tbl td{ border:1px solid #999 !important; padding:6px; }
+  .tbl thead th{ background:#B2E0F7 !important; text-align:center; } /* bleu ciel très clair */
+
+  /* Alignements */
+  .center{ text-align:center; }
+  .left{ text-align:left !important; }
+
+  /* Par défaut, ne pas afficher le footer à l’écran */
+  .footer-impression { display: none; }
+
+  @media print{
+    @page{ size:A4 landscape; margin:14mm; }
+    body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; padding-bottom:60px !important; } /* espace pour footer */
+    .tbl thead th{ background:#ADD8E6 !important; } /* renfort impression */
+    .tbl th, .tbl td{ border:1px solid #999 !important; }
+
+    /* Afficher le footer seulement à l’impression */
+    .footer-impression { display: block; }
+  }
+</style>
 {% endblock %}

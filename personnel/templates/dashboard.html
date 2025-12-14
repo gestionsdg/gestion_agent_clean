@@ -1,3 +1,5 @@
+{% load static %}
+
 {% block content %}
 <div style="border: 2px solid #00bfff; border-radius: 12px; padding: 20px; margin: 20px;">
   <h2 style="font-size: 35px; font-weight: bold; text-decoration: underline; text-align: center;">
@@ -5,151 +7,91 @@
   </h2>
 
   <div class="dashboard-grid">
-    <!-- Carte -->
-    <a href="{% url 'liste_total_agents' %}" class="card-dashboard bg-blue">
-      <div class="icon">👥</div>
-      <div class="label">Total Agents</div>
-      <div class="count" data-target="{{ total }}">0</div>
-    </a>
+    <!-- Carte "Total Agents" supprimée -->
 
-    <a href="{% url 'liste_actifs_par_entite' %}" class="card-dashboard bg-green">
+    <a href="{% url 'personnel:liste_actifs_par_entite' %}" class="card-dashboard bg-green">
       <div class="icon">✅</div>
       <div class="label">Agents Actifs</div>
-      <div class="count" data-target="{{ actifs }}">0</div>
+      {% with v=actifs|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_retraites_pdf' %}" class="card-dashboard bg-yellow text-dark">
+    <!-- Les 6 cartes ci-dessous déclenchent un prompt d'année (géré par dashboard.js) -->
+    <a href="{% url 'personnel:liste_retraites_pdf' %}" class="card-dashboard bg-yellow text-dark js-year-pdf">
       <div class="icon">👴</div>
       <div class="label">Retraités</div>
-      <div class="count" data-target="{{ retraites }}">0</div>
+      {% with v=retraites|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_decedes_pdf' %}" class="card-dashboard bg-red">
+    <a href="{% url 'personnel:liste_decedes_pdf' %}" class="card-dashboard bg-red js-year-pdf">
       <div class="icon">⚰️</div>
       <div class="label">Agents décédés</div>
-      <div class="count" data-target="{{ decedes }}">0</div>
+      {% with v=decedes|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_agents_ayant_ete_licencies_pdf' %}" class="card-dashboard bg-darkgreen">
+    <a href="{% url 'personnel:liste_licencies_pdf' %}" class="card-dashboard bg-darkgreen js-year-pdf">
       <div class="icon">❌</div>
-      <div class="label">Agents ayant été licenciés</div>
-      <div class="count" data-target="{{ agents_ayant_ete_licencies }}">0</div>
+      <div class="label">Agents licenciés</div>
+      {% with v=agents_ayant_ete_licencies|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_demissionnaires_pdf' %}" class="card-dashboard bg-teal">
+    <a href="{% url 'personnel:liste_demissionnaires_pdf' %}" class="card-dashboard bg-teal js-year-pdf">
       <div class="icon">📤</div>
       <div class="label">Démissionnaires</div>
-      <div class="count" data-target="{{ demissionnaires }}">0</div>
+      {% with v=demissionnaires|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_detachement_pdf' %}" class="card-dashboard bg-purple">
+    <a href="{% url 'personnel:liste_detachement_pdf' %}" class="card-dashboard bg-purple js-year-pdf">
       <div class="icon">🧳</div>
       <div class="label">Agents en détachement</div>
-      <div class="count" data-target="{{ en_detachement }}">0</div>
+      {% with v=en_detachement|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
 
-    <a href="{% url 'liste_agents_mis_en_disponibilite_pdf' %}" class="card-dashboard bg-indigo">
+    <a href="{% url 'personnel:liste_disponibilite_pdf' %}" class="card-dashboard bg-indigo js-year-pdf">
       <div class="icon">📂</div>
       <div class="label">Agents mis en disponibilité</div>
-      <div class="count" data-target="{{ en_disponibilite }}">0</div>
+      {% with v=en_disponibilite|default:0 %}
+        <div class="count" data-target="{{ v }}">{{ v }}</div>
+      {% endwith %}
     </a>
   </div>
 
-  <!-- Boutons -->
   <div style="width: 100%; text-align: center; margin-top: 25px;">
-    <a href="{% url 'liste_employes' %}">
-      <button class="btn btn-secondary">➡ Accéder à la liste des agents</button>
+    <a href="{% url 'personnel:liste_employes' %}">
+      <button class="btn btn-secondary">➡ Accéder à la liste des employés</button>
     </a>
-    {% if is_admin_rh %}
-    <a href="/admin/" style="margin-left: 10px;">
-      <button class="btn btn-secondary">↩️ Retour à l'Interface Admin</button>
-    </a>
+    {% url 'admin:index' as admin_index_url %}
+    {% if is_admin_rh and admin_index_url %}
+      <a href="{{ admin_index_url }}" style="margin-left: 10px;">
+        <button class="btn btn-secondary">↩️ Retour à l'Interface Admin</button>
+      </a>
     {% endif %}
   </div>
 </div>
 
 <style>
-.dashboard-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.card-dashboard {
-  width: 180px;
-  height: 150px;
-  padding: 18px;
-  border-radius: 16px;
-  text-align: center;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease-in-out;
-}
-
-.card-dashboard:hover {
-  transform: scale(1.05);
-  cursor: pointer;
-}
-
-.card-dashboard .icon {
-  font-size: 38px;
-  margin-bottom: 5px;
-}
-
-.card-dashboard .label {
-  font-size: 19px;
-  font-weight: bold;
-  margin-bottom: 3px;
-}
-
-.card-dashboard .count {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-/* Couleurs */
-.bg-blue { background-color: #007bff; }
-.bg-green { background-color: #28a745; }
-.bg-yellow { background-color: #ffc107; color: black !important; }
-.bg-red { background-color: #dc3545; }
-.bg-darkgreen { background-color: #228B22; }
-.bg-teal { background-color: #17a2b8; }
-.bg-purple { background-color: #6610f2; }
-.bg-indigo { background-color: #6f42c1; }
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-.text-dark { color: black !important; }
+.dashboard-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:30px}
+.card-dashboard{width:180px;height:150px;padding:18px;border-radius:16px;text-align:center;font-weight:bold;color:#fff;text-decoration:none;box-shadow:0 4px 6px rgba(0,0,0,.1);transition:transform .2s}
+.card-dashboard:hover{transform:scale(1.05);cursor:pointer}
+.card-dashboard .icon{font-size:38px;margin-bottom:5px}
+.card-dashboard .label{font-size:19px;font-weight:700;margin-bottom:3px}
+.card-dashboard .count{font-size:28px;font-weight:700}
+.bg-blue{background:#007bff}.bg-green{background:#28a745}.bg-yellow{background:#ffc107;color:#000!important}.bg-red{background:#dc3545}.bg-darkgreen{background:#228b22}.bg-teal{background:#17a2b8}.bg-purple{background:#6610f2}.bg-indigo{background:#6f42c1}
+.btn-secondary{background:#6c757d;color:#fff;border:none;padding:3px 14px;border-radius:8px;font-size:16px}
+.text-dark{color:#000!important}
 </style>
 
-<!-- Animation JS compteur -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".count").forEach(counter => {
-      const updateCount = () => {
-        const target = +counter.getAttribute('data-target');
-        const current = +counter.innerText;
-        const increment = Math.ceil(target / 40);
-        if (current < target) {
-          counter.innerText = current + increment;
-          setTimeout(updateCount, 20);
-        } else {
-          counter.innerText = target;
-        }
-      };
-      updateCount();
-    });
-  });
-</script>
+<!-- Un seul JS, qui gère l'animation + le prompt d'année -->
+<script src="{% static 'js/dashboard.js' %}" defer></script>
 {% endblock %}

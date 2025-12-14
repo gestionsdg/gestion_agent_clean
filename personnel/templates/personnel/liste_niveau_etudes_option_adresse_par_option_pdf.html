@@ -5,14 +5,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>{{ titre|default:"Niveau d'études, option et adresses" }}</title>
+  <title>{{ titre|default:"Niveau d'études, option et adresses par option" }}</title>
   <style>
     body {
       font-family: "DejaVu Sans", Arial, sans-serif;
       font-size: 11.5px;
     }
 
-    /* En-tête CNSS */
     .header-cnss {
       text-align: left;
       margin-bottom: 8px;
@@ -32,30 +31,28 @@
     h2 {
       text-align: center;
       font-size: 15px;
-      margin: 4px 0 6px 0;
+      margin: 4px 0 4px 0;
       text-decoration: underline;
     }
 
-    /* Zone infos : on n'affiche plus l'entité, seulement la date */
     .meta {
       font-size: 10px;
-      margin-bottom: 6px;
-      overflow: auto;
+      margin: 2px 0 10px 0;
+      text-align: right;
     }
-    .meta .right {
-      float: right;
+    .meta span {
+      display: inline-block;
     }
 
-    /* Tableau principal */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 4px;
+      margin-top: 0;
       font-size: 11px;
     }
 
     th, td {
-      border: 1px solid #555;  /* bordures fines gris foncé */
+      border: 1px solid #555;
       padding: 3px 4px;
     }
 
@@ -74,8 +71,8 @@
     td.nom,
     td.grade,
     td.niveau,
-    td.option,
-    td.adresse {
+    td.adresse,
+    td.entite {
       text-align: left;
     }
 
@@ -83,12 +80,10 @@
     td.grade {
       white-space: nowrap;
     }
-
   </style>
 </head>
 <body>
 
-  <!-- En-tête CNSS -->
   <div class="header-cnss">
     {% if logo_b64 %}
       <img src="{{ logo_b64 }}" alt="Logo CNSS">
@@ -98,17 +93,12 @@
     </div>
   </div>
 
-  <!-- Titre principal (contient déjà l'entité) -->
   <h2>{{ titre }}</h2>
 
-  <!-- Ligne des infos : on n'affiche que la date -->
   <div class="meta">
-    <span class="right">
-      <strong>Date :</strong> {{ today|date:"d/m/Y" }}
-    </span>
+    <span><strong>Date :</strong> {{ today|date:"d/m/Y" }}</span>
   </div>
 
-  <!-- Tableau principal -->
   <table>
     <thead>
       <tr>
@@ -117,27 +107,32 @@
         <th style="width: 70px;">Matricule</th>
         <th style="width: 35px;">Sexe</th>
         <th style="width: 110px;">Grade actuel</th>
-        <th style="width: 120px;">Niveau d'études</th>
-        <th style="width: 130px;">Option</th>
+        <!-- largeur Niveau d'études un peu réduite -->
+        <th style="width: 100px;">Niveau d'études</th>
+        <!-- ✅ PAS de colonne Option -->
         <th>Adresse</th>
+        <th style="width: 120px;">Entité</th>
       </tr>
     </thead>
-
     <tbody>
       {% for row in donnees %}
         <tr>
+          <!-- donnees = [idx, nom, matricule, sexe, grade, niveau, adresse, entite] -->
           <td class="num">{{ row.0 }}</td>
           <td class="nom">{{ row.1|clean_nan }}</td>
           <td class="matricule">{{ row.2|clean_nan }}</td>
           <td class="sexe">{{ row.3|clean_nan }}</td>
           <td class="grade">{{ row.4|clean_nan }}</td>
           <td class="niveau">{{ row.5|clean_nan }}</td>
-          <td class="option">{{ row.6|clean_nan }}</td>
-          <td class="adresse">{{ row.7|clean_nan }}</td>
+          <td class="adresse">{{ row.6|clean_nan }}</td>
+          <td class="entite">{{ row.7|clean_nan }}</td>
         </tr>
       {% empty %}
         <tr>
-          <td colspan="8" style="text-align:center;">Aucun agent trouvé.</td>
+          <!-- 8 colonnes -->
+          <td colspan="8" style="text-align:center;">
+            Aucun agent trouvé.
+          </td>
         </tr>
       {% endfor %}
     </tbody>

@@ -1,16 +1,33 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <style>
+  @media print {
+    thead { display: table-header-group; } /* répète l'entête à chaque page imprimée */
+  }
+
   h2 {
     text-align: center;
     text-decoration: underline;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+  .stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .badge {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #f8f9fa;
   }
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 14px;
     font-size: 13px;
   }
   th, td {
@@ -20,41 +37,144 @@
   th {
     text-align: center;
     background-color: #f2f2f2;
+    position: sticky; top: 0; z-index: 1; /* header collant au scroll */
   }
-  td.center {
-    text-align: center;
-  }
-  td.left {
-    text-align: left;
+  tbody tr:nth-child(even) { background: #fafafa; }
+  td.center { text-align: center; }
+  td.left { text-align: left; }
+  .section-title {
+    margin-top: 22px;
+    font-weight: bold;
+    text-decoration: underline;
   }
 </style>
 
-<h2>Effectif des Contrôleurs de la CNSS</h2>
+<h2>{{ titre|default:"Effectif des Contrôleurs de la CNSS" }}</h2>
 
+<div class="stats">
+  <span class="badge">Seuil : {{ seuil_age|default:55 }} ans</span>
+  <span class="badge">Moins de {{ seuil_age|default:55 }} : {{ moins_de_55|length }}</span>
+  <span class="badge">≥ {{ seuil_age|default:55 }} : {{ plus_de_54|length }}</span>
+  <span class="badge">Total (âges connus) : {{ total|default:0 }}</span>
+  {% if age_inconnu %}
+    <span class="badge">Âge inconnu : {{ age_inconnu|length }}</span>
+  {% endif %}
+</div>
+
+<!-- Moins de seuil -->
+<h3 class="section-title">Agents &lt; {{ seuil_age|default:55 }} ans ({{ moins_de_55|length }})</h3>
 <table>
+  <colgroup>
+    <col style="width:60px;">
+    <col style="width:220px;">
+    <col style="width:120px;">
+    <col style="width:220px;">
+    <col style="width:80px;">
+    <col>
+    <col>
+  </colgroup>
   <thead>
     <tr>
       <th>N°</th>
-      <th>Effectif &lt; 55 ans</th>
-      <th>Âges &lt; 55 ans</th>
-      <th>Effectif ≥ 55 ans</th>
-      <th>Âges ≥ 55 ans</th>
-      <th>Total Effectif</th>
+      <th>Nom</th>
+      <th>Matricule</th>
       <th>Entité</th>
+      <th>Âge</th>
+      <th>Fonction</th>
+      <th>Service</th>
     </tr>
   </thead>
   <tbody>
-    {% for row in donnees %}
-    <tr>
-      <td class="center">{{ forloop.counter }}</td>
-      <td class="center">{{ row.effectif_moins_55|default:"-" }}</td>
-      <td class="center">{{ row.ages_moins_55|default:"-" }}</td>
-      <td class="center">{{ row.effectif_plus_54|default:"-" }}</td>
-      <td class="center">{{ row.ages_plus_54|default:"-" }}</td>
-      <td class="center">{{ row.total|default:"-" }}</td>
-      <td class="left">{{ row.entite|default:"-" }}</td>
-    </tr>
+    {% for emp in moins_de_55 %}
+      <tr>
+        <td class="center">{{ forloop.counter }}</td>
+        <td class="left">{{ emp.nom|default:"-" }}</td>
+        <td class="center">{{ emp.matricule|default:"-" }}</td>
+        <td class="left">{{ emp.entite|default:"-" }}</td>
+        <td class="center">{{ emp.age|default:"-" }}</td>
+        <td class="left">{{ emp.fonction|default:"-" }}</td>
+        <td class="left">{{ emp.service|default:"-" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td class="center" colspan="7">Aucun agent dans cette tranche.</td></tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- Au moins le seuil -->
+<h3 class="section-title">Agents ≥ {{ seuil_age|default:55 }} ans ({{ plus_de_54|length }})</h3>
+<table>
+  <colgroup>
+    <col style="width:60px;">
+    <col style="width:220px;">
+    <col style="width:120px;">
+    <col style="width:220px;">
+    <col style="width:80px;">
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Matricule</th>
+      <th>Entité</th>
+      <th>Âge</th>
+      <th>Fonction</th>
+      <th>Service</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for emp in plus_de_54 %}
+      <tr>
+        <td class="center">{{ forloop.counter }}</td>
+        <td class="left">{{ emp.nom|default:"-" }}</td>
+        <td class="center">{{ emp.matricule|default:"-" }}</td>
+        <td class="left">{{ emp.entite|default:"-" }}</td>
+        <td class="center">{{ emp.age|default:"-" }}</td>
+        <td class="left">{{ emp.fonction|default:"-" }}</td>
+        <td class="left">{{ emp.service|default:"-" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td class="center" colspan="7">Aucun agent dans cette tranche.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Optionnel : âges inconnus -->
+{% if age_inconnu and age_inconnu|length > 0 %}
+  <h3 class="section-title">Âge inconnu ({{ age_inconnu|length }})</h3>
+  <table>
+    <colgroup>
+      <col style="width:60px;">
+      <col style="width:220px;">
+      <col style="width:120px;">
+      <col style="width:220px;">
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>Nom</th>
+        <th>Matricule</th>
+        <th>Entité</th>
+        <th>Fonction</th>
+        <th>Service</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in age_inconnu %}
+        <tr>
+          <td class="center">{{ forloop.counter }}</td>
+          <td class="left">{{ emp.nom|default:"-" }}</td>
+          <td class="center">{{ emp.matricule|default:"-" }}</td>
+          <td class="left">{{ emp.entite|default:"-" }}</td>
+          <td class="left">{{ emp.fonction|default:"-" }}</td>
+          <td class="left">{{ emp.service|default:"-" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
 {% endblock %}

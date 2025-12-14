@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -13,7 +12,14 @@
             .entite-col {
                 display: none !important;
             }
+            /* ✅ Espace pour le footer fixé + affichage du footer uniquement à l'impression */
+            body { padding-bottom: 60px !important; }
+            .footer-impression { display: block; }
         }
+
+        /* Par défaut, le footer n'apparaît pas à l'écran */
+        .footer-impression { display: none; }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -91,5 +97,8 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- ✅ Footer réutilisable : visible uniquement à l’impression -->
+    {% include "personnel/_footer_impression.html" %}
 </body>
 </html>

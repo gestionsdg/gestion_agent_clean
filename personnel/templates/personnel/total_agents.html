@@ -1,51 +1,147 @@
-
-{% load static %}
 {% load extra_filters %}
 
-{% block content %}
-  <h1 style="text-align: center; font-size: 22px; text-decoration: underline;">Liste complète des agents de la CNSS</h1>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title|default:"Liste des Agents" }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 10px; font-size: 13px; }
+        h1 { text-align: center; color: #333; font-size: 20px; margin-bottom: 10px; text-decoration: underline; }
 
-  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px;">
-    <thead>
-      <tr style="background-color: #f0f0f0;">
-        <th style="border: 1px solid #ccc; padding: 6px;">Nom</th>
-        <th style="border: 1px solid #ccc; padding: 6px;">Matricule</th>
-        <th style="border: 1px solid #ccc; padding: 6px;">Sexe</th>
-        <th style="border: 1px solid #ccc; padding: 6px;">Grade actuel</th>
-        <th style="border: 1px solid #ccc; padding: 6px;">Entité</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for employe in page_obj %}
-        <tr>
-          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.nom }}</td>
-          <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ employe.matricule }}</td>
-          <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ employe.sexe }}</td>
-          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.grade_actuel }}</td>
-          <td style="border: 1px solid #ccc; padding: 6px;">{{ employe.entite }}</td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="5" style="text-align:center;">Aucun agent trouvé.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        /* Table */
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: fixed; }
+        th, td { border: 1px solid #ccc; padding: 4px 6px; word-wrap: break-word; font-size: 13px; }
+        th { background-color: #d0e7f9; text-align: center; }
+        th.col-num, td.col-num { width: 40px; text-align: center; }
+        th.col-matricule, td.col-matricule { width: 60px; text-align: center; }
+        th.col-sexe, td.col-sexe { width: 35px; text-align: center; }
+        th.col-nom, td.col-nom { width: 160px; }
+        th.col-fonction, td.col-fonction { width: 150px; }
+        th.col-service, td.col-service { width: 160px; }
+        th.col-entite, td.col-entite { width: 160px; }
+        td { text-align: left; }
 
-  <!-- Pagination -->
-  <div style="text-align: center; margin-top: 20px;">
-    <span class="step-links">
-      {% if page_obj.has_previous %}
-        <a href="?page=1">« première</a>
-        <a href="?page={{ page_obj.previous_page_number }}">‹ précédente</a>
-      {% endif %}
+        /* Pagination */
+        .pagination { text-align: center; margin-top: 15px; font-size: 12px; }
+        .pagination a, .pagination span {
+            padding: 3px 6px; margin: 0 2px; border: 1px solid #ccc; text-decoration: none; color: #333;
+        }
+        .pagination .current { background-color: #333; color: #fff; font-weight: bold; }
 
-      <span style="margin: 0 10px;">
-        Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
-      </span>
+        /* Boutons (liens stylés) */
+        .actions { text-align: center; margin-bottom: 15px; }
+        .btn {
+            display: inline-block; cursor: pointer; text-decoration: none; font-weight: 600;
+            border-radius: 5px; padding: 6px 12px; line-height: 1;
+        }
+        .btn-blue { background-color: #007bff; color: #fff; border: none; }
+        .btn-blue:hover { opacity: .9; }
+        .btn-gap { margin-left: 8px; }
 
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">suivante ›</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">dernière »</a>
-      {% endif %}
-    </span>
-  </div>
-{% endblock %}
+        .meta { text-align:center; margin-top:6px; font-size:12px; color:#444; }
+    </style>
+</head>
+<body>
+    <h1>{{ title|default:"Liste des Cadres et Agents de la CNSS" }}</h1>
+
+    <div class="meta">
+        {% if nb_total %}
+            <strong>Total :</strong> {{ nb_total }}
+        {% elif page_obj %}
+            <strong>Total :</strong> {{ page_obj.paginator.count }}
+        {% elif agents %}
+            <strong>Total :</strong> {{ agents|length }}
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <!-- Dashboard = nom simple (non namespacé) d'après show_urls -->
+        <a href="{% url 'dashboard' %}" class="btn btn-blue">⬅ Retour au tableau de bord</a>
+
+        <!-- FIX: route namespacée vers la liste des employés -->
+        <a href="{% url 'personnel:liste_employes' %}"
+           class="btn btn-blue btn-gap"
+           title="Retour à la liste des employés">
+            ⬅ Retour à la liste des employés
+        </a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="col-num">N°</th>
+                <th class="col-nom">Nom</th>
+                <th>Prénom</th>
+                <th class="col-matricule">Matricule</th>
+                <th>Grade actuel</th>
+                <th class="col-sexe">Sexe</th>
+                <th>Service</th>
+                <th class="col-fonction">Fonction</th>
+                <th>Statut</th>
+                <th class="col-entite">Entité</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {# --- Branche 1 : avec pagination (page_obj) --- #}
+            {% if page_obj %}
+                {% for emp in page_obj %}
+                <tr>
+                    {# start_index est 1-based → on additionne forloop.counter0 #}
+                    <td class="col-num">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                    <td class="col-nom">{{ emp.nom|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.prenom|clean_nan|default:"-" }}</td>
+                    <td class="col-matricule">{{ emp.matricule|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.grade_actuel|clean_nan|default:"-" }}</td>
+                    <td class="col-sexe">{{ emp.sexe|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.service|clean_nan|default:"-" }}</td>
+                    <td class="col-fonction">{{ emp.fonction|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.statut|clean_nan|default:"-" }}</td>
+                    <td class="col-entite">{{ emp.entite|clean_nan|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" style="text-align: center;">Aucun résultat trouvé.</td></tr>
+                {% endfor %}
+            {# --- Branche 2 : sans pagination (liste simple 'agents') --- #}
+            {% elif agents %}
+                {% for emp in agents %}
+                <tr>
+                    <td class="col-num">{{ forloop.counter }}</td>
+                    <td class="col-nom">{{ emp.nom|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.prenom|clean_nan|default:"-" }}</td>
+                    <td class="col-matricule">{{ emp.matricule|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.grade_actuel|clean_nan|default:"-" }}</td>
+                    <td class="col-sexe">{{ emp.sexe|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.service|clean_nan|default:"-" }}</td>
+                    <td class="col-fonction">{{ emp.fonction|clean_nan|default:"-" }}</td>
+                    <td>{{ emp.statut|clean_nan|default:"-" }}</td>
+                    <td class="col-entite">{{ emp.entite|clean_nan|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" style="text-align: center;">Aucun résultat trouvé.</td></tr>
+                {% endfor %}
+            {# --- Aucune donnée fournie --- #}
+            {% else %}
+                <tr><td colspan="10" style="text-align: center;">Aucune donnée à afficher.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    {# Pagination visible uniquement si page_obj existe #}
+    {% if page_obj %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« première</a>
+            <a href="?page={{ page_obj.previous_page_number }}">‹ précédente</a>
+        {% endif %}
+        <span class="current">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">suivante ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">dernière »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>

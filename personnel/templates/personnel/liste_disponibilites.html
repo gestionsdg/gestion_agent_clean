@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}{{ titre }}{% endblock %}
 
 {% block content %}
 <!-- TITRE CENTRÉ ET SOULIGNÉ -->
@@ -7,7 +8,7 @@
 </h2>
 
 <!-- BOUTONS ACTIONS : RETOUR À GAUCHE | IMPRIMER À DROITE -->
-<div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+<div class="actions" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
   <!-- Bouton retour -->
   <a href="{% url 'liste_employes' %}" class="btn btn-secondary" style="padding: 6px 12px; background-color: #ccc; text-decoration: none; border-radius: 5px;">
     ⬅ Retour à la liste des employés
@@ -46,16 +47,37 @@
     {% endfor %}
   </tbody>
 </table>
-{% endblock %}
 
-<!-- FORMAT IMPRESSION EN PAYSAGE -->
+<!-- Élément "running" pour afficher UNIQUEMENT en DERNIÈRE page (WeasyPrint) -->
+<div class="print-stamp-last">Document imprimé : le {% now "d/m/Y H:i" %}</div>
+
+<!-- FORMAT IMPRESSION EN PAYSAGE + tampon dernière page -->
 <style>
-    @media print {
-        @page {
-            size: landscape;
-        }
-        .btn-imprimer {
-            display: none;
-        }
+  /* Masquer le tampon à l'écran */
+  .print-stamp-last { display: none; }
+
+  @media print {
+    @page {
+      size: landscape;
+      margin: 20mm 15mm 20mm 15mm;
+      /* Par défaut, rien en pied de page */
+      @bottom-right { content: none; }
     }
+    /* Afficher le tampon uniquement sur la DERNIÈRE page (WeasyPrint) */
+    @page :last {
+      @bottom-right { content: element(doc_stamp); }
+    }
+
+    .actions, .btn-imprimer { display: none !important; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Élément "running" utilisé pour le pied de page WeasyPrint */
+    .print-stamp-last {
+      display: block;
+      position: running(doc_stamp);
+      height: 0; overflow: hidden;   /* ne prend pas de place dans le flux */
+      font-size: 11px; color: #555; text-align: right;
+    }
+  }
 </style>
+{% endblock %}

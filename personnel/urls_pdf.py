@@ -15,13 +15,16 @@ urlpatterns = [
     path('demissionnaires/pdf/', views_pdf_weasyprint.liste_demissionnaires_pdf, name='liste_demissionnaires_pdf'),
     path('decedes/pdf/', views_pdf_weasyprint.liste_decedes_pdf, name='liste_decedes_pdf'),
 
-    # Effectif par entité (manquant avant)
+    # Effectif par entité
     path('effectif-par-entite/pdf/', views_pdf_weasyprint.liste_effectif_par_entite_pdf, name='liste_effectif_par_entite_pdf'),
 
-    # Effectif par grade (simple)
+    # Effectif par grade
     path('effectif-par-grade/pdf/', views_pdf_weasyprint.liste_effectif_par_grade_pdf, name='liste_effectif_par_grade_pdf'),
 
     # Agents licenciés et mis en disponibilité
     path('agents-ayant-ete-licencies/pdf/', views_pdf_weasyprint.liste_agents_ayant_ete_licencies_pdf, name='liste_agents_ayant_ete_licencies_pdf'),
     path('agents-mis-en-disponibilite/pdf/', views_pdf_weasyprint.liste_agents_mis_en_disponibilite_pdf, name='liste_agents_mis_en_disponibilite_pdf'),
+
+    # ✅ Nouvelle route pour le bouton de total_agents.html
+    path('total-agents/pdf/', views_pdf_weasyprint.liste_total_agents_pdf, name='liste_total_agents_pdf'),
 ]

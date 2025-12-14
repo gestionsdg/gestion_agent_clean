@@ -1,5 +1,5 @@
-
 {% load extra_filters %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,26 +7,36 @@
     <meta charset="UTF-8">
     <title>Fiche de l'employé</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px 15px;
-        }
-        h2 {
-            text-align: center;
-        }
-        .photo-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px 15px; }
+        h2, h3 { text-align: center; }
+        /* Titre souligné (impression/PDF inclus) */
+        h3 { text-decoration: underline; }
+
+        .photo-container { text-align: center; margin-bottom: 20px; }
         .photo-container img {
             max-height: 180px;
+            max-width: 100%;
             border: 1px solid #ccc;
             padding: 4px;
+            object-fit: cover;
+            border-radius: 6px;
         }
-        .btn-imprimer {
-            text-align: right;
-            margin-bottom: 10px;
+        /* Encadré “Insérer la photo” */
+        .no-photo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 180px;
+            width: 180px;
+            max-width: 100%;
+            border: 2px dashed #bbb;
+            color: #777;
+            font-weight: 600;
+            border-radius: 6px;
+            background: #fafafa;
         }
+
+        .btn-imprimer { text-align: right; margin-bottom: 10px; }
         .btn-imprimer button {
             padding: 6px 12px;
             background-color: #4285f4;
@@ -35,76 +45,104 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        td, th {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: left;
-            vertical-align: top;
-        }
-        td ul {
-            margin: 0;
-            padding-left: 18px;
-        }
-        td li {
-            margin-bottom: 3px;
-        }
-        @media print {
-            .btn-imprimer {
-                display: none;
-            }
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+        td, th { padding: 8px; border: 1px solid #ccc; text-align: left; vertical-align: top; word-wrap: break-word; }
+        .pre-lines { white-space: pre-line; } /* Affiche les retours à la ligne du texte brut */
+        @media print { .btn-imprimer { display: none; } }
     </style>
 </head>
 <body>
-    <h3 h3 style="text-align: center;">
-		Fiche individuelle de l'agent {{ employe.nom|stringformat:"s"|default:"-" }}
-        {% if employe.prenom and employe.prenom != 'nan' %}
-            {{ employe.prenom }}
-        {% endif %}
+    <h3>
+        Fiche individuelle de l'agent
+        {{ employe.nom|default_if_none:""|clean_nan|default:"-" }}
+        {% with rawp=employe.prenom|default_if_none:""|clean_nan %}
+            {% if rawp %}
+                {% with p=rawp|lower %}
+                    {% if p != 'inconnu' and p != 'none' and p != 'nan' %}
+                        {{ rawp }}
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        {% endwith %}
     </h3>
+
     <div class="btn-imprimer">
         <button onclick="window.print()">🖨️ Imprimer cette fiche</button>
     </div>
-    {% if employe.photo %}
-        <div class="photo-container">
-            <img src="{{ employe.photo.url }}" alt="Photo de l'agent">
-        </div>
-    {% endif %}
+
+    <div class="photo-container">
+        {# 1) Cas PDF (WeasyPrint) : image en base64 injectée par la vue #}
+        {% if photo_url_for_pdf %}
+            <img src="{{ photo_url_for_pdf }}" alt="Photo de l'agent">
+        {# 2) Cas HTML normal : URL media ; si échec → afficher “Insérer la photo” #}
+        {% elif employe.photo %}
+            <img src="{{ employe.photo.url }}"
+                 alt="Photo de l'agent"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+            <div class="no-photo" style="display:none" role="img" aria-label="Aucune photo">Insérer la photo</div>
+        {# 3) Pas de photo du tout : afficher “Insérer la photo” #}
+        {% else %}
+            <div class="no-photo" role="img" aria-label="Aucune photo">Insérer la photo</div>
+        {% endif %}
+    </div>
+
     <table>
-        <tr><th>Entité</th><td>{{ employe.entite|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Matricule</th><td>{{ employe.matricule|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Sexe</th><td>{{ employe.sexe|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Etat civil</th><td>{{ employe.etat_civil|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Nom du (de la) conjoint (e)</th><td>{{ employe.nom_conjoint|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Grade d'engagement</th><td>{{ employe.grade_engagement|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Date d'engagement</th><td>{{ employe.date_engagement|date:'d/m/Y'|clean_nan }}</td></tr>
-        <tr><th>Ancienneté à la CNSS</th><td>{{ anciennete_societe|clean_nan }}</td></tr>
-        <tr><th>Date de naissance</th><td>{{ employe.date_naissance|date:'d/m/Y'|clean_nan }}</td></tr>
-        <tr><th>Âge</th><td>{{ age|clean_nan }}</td></tr>
-        <tr><th>Grade actuel</th><td>{{ employe.grade_actuel|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Date dernière promotion</th><td>{{ employe.date_derniere_promotion|date:'d/m/Y'|clean_nan }}</td></tr>
-        <tr><th>Ancienneté dans le grade</th><td>{{ anciennete_grade|clean_nan }}</td></tr>
-        <tr><th>Service</th><td>{{ employe.service|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Date d'affectation</th><td>{{ employe.date_affectation|date:'d/m/Y'|clean_nan }}</td></tr>
-        <tr><th>Durée d’affectation</th><td>{{ duree_affectation|clean_nan }}</td></tr>
-        <tr><th>Fonction</th><td>{{ employe.fonction|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Date prise de fonction</th><td>{{ employe.date_prise_fonction|date:'d/m/Y'|clean_nan }}</td></tr>
-        <tr><th>Durée prise de fonction</th><td>{{ duree_prise_fonction|clean_nan }}</td></tr>
-        <tr><th>Niveau d'études</th><td>{{ employe.niveau_etudes|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Option</th><td>{{ employe.option|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Adresse</th><td>{{ employe.adresse|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Téléphone 1</th><td>{{ employe.telephone1|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Téléphone 2</th><td>{{ employe.telephone2|stringformat:"s"|clean_nan }}</td></tr>
-        <tr><th>Parcours professionnel</th><td>{% if employe.parcours_professionnel and employe.parcours_professionnel != 'nan' %}<ul>{% for item in employe.parcours_professionnel.splitlines %}{% if item.strip %}<li>{{ item }}</li>{% endif %}{% endfor %}</ul>{% else %}-{% endif %}</td></tr>
-        <tr><th>Formations suivies</th><td>{% if employe.formations_suivies and employe.formations_suivies != 'nan' %}<ul>{% for item in employe.formations_suivies.splitlines %}{% if item.strip %}<li>{{ item }}</li>{% endif %}{% endfor %}</ul>{% else %}-{% endif %}</td></tr>
-        <tr><th>Besoin en formation</th><td>{% if employe.besoin_en_formation and employe.besoin_en_formation != 'nan' %}<ul>{% for item in employe.besoin_en_formation.splitlines %}{% if item.strip %}<li>{{ item }}</li>{% endif %}{% endfor %}</ul>{% else %}-{% endif %}</td></tr>
-        <tr><th>Statut</th><td>{{ employe.statut|stringformat:"s"|clean_nan }}</td></tr>
+        <tr><th>Entité</th><td>{{ employe.entite|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Matricule</th><td>{{ employe.matricule|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Sexe</th><td>{{ employe.sexe|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>État civil</th><td>{{ employe.etat_civil|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Nom du (de la) conjoint(e)</th><td>{{ employe.nom_conjoint|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Grade d'engagement</th><td>{{ employe.grade_engagement|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Date d'engagement</th><td>{{ employe.date_engagement|date:'d/m/Y'|default:"-" }}</td></tr>
+        <tr><th>Ancienneté à la CNSS</th><td>{{ anciennete_societe|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Date de naissance</th><td>{{ employe.date_naissance|date:'d/m/Y'|default:"-" }}</td></tr>
+        <tr><th>Âge</th><td>{{ age|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Grade actuel</th><td>{{ employe.grade_actuel|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Date dernière promotion</th><td>{{ employe.date_derniere_promotion|date:'d/m/Y'|default:"-" }}</td></tr>
+        <tr><th>Ancienneté dans le grade</th><td>{{ anciennete_grade|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Service</th><td>{{ employe.service|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Date d'affectation</th><td>{{ employe.date_affectation|date:'d/m/Y'|default:"-" }}</td></tr>
+        <tr><th>Durée d’affectation</th><td>{{ duree_affectation|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Fonction</th><td>{{ employe.fonction|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Date prise de fonction</th><td>{{ employe.date_prise_fonction|date:'d/m/Y'|default:"-" }}</td></tr>
+        <tr><th>Durée prise de fonction</th><td>{{ duree_prise_fonction|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Niveau d'études</th><td>{{ employe.niveau_etudes|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Option</th><td>{{ employe.option|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Adresse</th><td>{{ employe.adresse|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Téléphone 1</th><td>{{ employe.telephone1|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+        <tr><th>Téléphone 2</th><td>{{ employe.telephone2|default_if_none:""|clean_nan|default:"-" }}</td></tr>
+
+        <!-- Textes multi-lignes : afficher "-" si vide/None/nan -->
+        <tr>
+            <th>Parcours professionnel</th>
+            <td class="pre-lines">
+                {% with t=employe.parcours_professionnel|default_if_none:""|clean_nan %}
+                    {% if t %}{{ t }}{% else %}-{% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+        <tr>
+            <th>Formations suivies</th>
+            <td class="pre-lines">
+                {% with t=employe.formations_suivies|default_if_none:""|clean_nan %}
+                    {% if t %}{{ t }}{% else %}-{% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+        <tr>
+            <th>Besoin en formation</th>
+            <td class="pre-lines">
+                {% with t=employe.besoin_en_formation|default_if_none:""|clean_nan %}
+                    {% if t %}{{ t }}{% else %}-{% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+
+        <tr><th>Statut</th><td>{{ employe.statut|default_if_none:""|clean_nan|default:"-" }}</td></tr>
     </table>
-    <p style="text-align: right; margin-top: 20px;"><em>Fiche imprimée le : {{ date_impression }}</em></p>
+
+    <p style="text-align: right; margin-top: 20px;">
+        <em>Fiche imprimée le : {{ date_impression|default:"" }}</em>
+    </p>
 </body>
 </html>

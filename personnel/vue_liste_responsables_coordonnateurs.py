@@ -1,71 +1,102 @@
-from django.contrib.auth.decorators import login_required
+# personnel/vue_liste_reponsables_coordonnateurs.py
 from datetime import date
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render
+
 from .models import Employe
+
+
+# Fonctions ciblées (exactes)
+FONCTIONS_CIBLES = [
+    "Responsable",
+    "Responsable a.i",
+    "Coordonnateur",
+    "Coordonnateur a.i",
+]
+
+# Listes utilisées pour une éventuelle surbrillance côté template
+FONCTIONS_SURBRILLANCE_BLEUE = ["Responsable a.i", "Coordonnateur a.i"]
+GRADES_SURBRILLANCE_VERTE = ["Chef de Sce Adjt", "Chef de Section", "Rédacteur Ppal", "Rédacteur"]
+
+
+def _years_since(d):
+    """Durée en années révolues depuis la date `d` (ou '-')."""
+    if not d:
+        return "-"
+    t = date.today()
+    years = t.year - d.year - ((t.month, t.day) < (d.month, d.day))
+    return f"{years} an" if years == 1 else f"{years} ans"
+
 
 @login_required
 def liste_responsables_coordonnateurs(request):
-    entite_choisie = request.GET.get('entite')
+    # Entité choisie (optionnelle)
+    entite_choisie = (request.GET.get("entite") or "").strip()
 
-    fonctions_cibles = [
-        "Responsable",
-        "Responsable a.i",
-        "Coordonnateur",
-        "Coordonnateur a.i"
-    ]
+    # Filtre robuste : correspondances exactes + variantes tolérantes
+    filtre_fonction = (
+        Q(fonction__in=FONCTIONS_CIBLES)
+        | Q(fonction__icontains="responsable")
+        | Q(fonction__icontains="coordonnateur")
+    )
 
-    fonctions_surbrillance_bleue = ["Responsable a.i", "Coordonnateur a.i"]
-    grades_surbrillance_verte = ["Chef de Sce Adjt", "Chef de Section", "Rédacteur Ppal", "Rédacteur"]
+    base_qs = Employe.objects.filter(filtre_fonction)
 
-    entites_disponibles = Employe.objects.filter(
-        fonction__in=fonctions_cibles
-    ).values_list("entite", flat=True).distinct()
+    # Entités disponibles (nettoyées, uniques, triées)
+    entites_nettoyees = (
+        base_qs.exclude(entite__isnull=True)
+        .exclude(entite__exact="")
+        .values_list("entite", flat=True)
+        .distinct()
+        .order_by("entite")
+    )
 
-    agents = Employe.objects.filter(fonction__in=fonctions_cibles)
+    # Filtrage par entité (si fourni)
     if entite_choisie:
-        agents = agents.filter(entite=entite_choisie)
+        qs = base_qs.filter(entite__iexact=entite_choisie)
         titre = f"Liste des Responsables et Coordonnateurs du Service - {entite_choisie}"
     else:
+        qs = base_qs
         titre = "Liste des Responsables et Coordonnateurs du Service"
 
+    # Tri lisible
+    qs = qs.order_by("entite", "nom", "prenom")
+
+    # Construction des lignes pour le template
     donnees = []
-    for idx, emp in enumerate(agents.order_by("nom"), 1):
-        duree = "-"
-        if emp.date_affectation:
-            today = date.today()
-            delta = today.year - emp.date_affectation.year
-            if (today.month, today.day) < (emp.date_affectation.month, emp.date_affectation.day):
-                delta -= 1
-            duree = f"{delta} an{'s' if delta > 1 else ''}"
-
-        # Détermine la classe de surbrillance
-        if emp.fonction in fonctions_surbrillance_bleue:
-            row_class = "bg-fonction"
-        elif emp.grade_actuel in grades_surbrillance_verte:
-            row_class = "bg-grade"
-        else:
-            row_class = ""
-
+    for idx, emp in enumerate(qs, start=1):
         donnees.append([
             idx,
-            emp.nom or '-',
-            emp.matricule or '-',
-            emp.grade_actuel or '-',
-            emp.sexe or '-',
-            emp.service or '-',
-            emp.fonction or '-',
-            emp.date_affectation.strftime("%d/%m/%Y") if emp.date_affectation else '-',
-            duree,
-            emp.entite or '-',
-            row_class
+            emp.nom or "-",
+            emp.matricule or "-",
+            emp.grade_actuel or "-",
+            emp.sexe or "-",
+            emp.service or "-",
+            emp.fonction or "-",
+            emp.date_affectation.strftime("%d/%m/%Y") if emp.date_affectation else "-",
+            _years_since(emp.date_affectation),
+            emp.entite or "-",
         ])
 
-    colonnes = ['N°', 'Nom', 'Matricule', 'Grade actuel', 'Sexe', 'Service', 'Fonction', 'Date affectation', 'Durée affectation', 'Entité']
+    colonnes = [
+        "N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Service",
+        "Fonction", "Date affectation", "Durée affectation", "Entité",
+    ]
 
-    return render(request, 'personnel/liste_responsables_coordonnateurs.html', {
-        'donnees': donnees,
-        'colonnes': colonnes,
-        'titre': titre,
-        'entites': entites_disponibles,
-        'selected_entite': entite_choisie
-    })
+    return render(
+        request,
+        "personnel/liste_responsables_coordonnateurs.html",
+        {
+            "donnees": donnees,
+            "colonnes": colonnes,
+            "titre": titre,
+            "entites": list(entites_nettoyees),
+            "selected_entite": entite_choisie,   # compatibilité avec templates existants
+            "entite_choisie": entite_choisie,    # (si utilisé ailleurs)
+            # Optionnel : listes pour surbrillance dans le template
+            "fonctions_surbrillance_bleue": FONCTIONS_SURBRILLANCE_BLEUE,
+            "grades_surbrillance_verte": GRADES_SURBRILLANCE_VERTE,
+        },
+    )

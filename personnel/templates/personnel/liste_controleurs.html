@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -6,101 +5,133 @@
     <meta charset="UTF-8">
     <title>{{ titre }}</title>
     <style>
+        /* Marges réduites à l'écran (haut ↓ de 90px à 16px) */
+        body { margin: 16px 90px 90px; }
+
+        /* Impression : marges réduites + cache des éléments non imprimables */
         @media print {
-            .no-print, .no-print * {
-                display: none !important;
-            }
-            .entite-col {
-                display: none !important;
-            }
+            @page { size: A4 landscape; margin: 8mm 10mm; }
+            body { margin: 0; }
+            .no-print, .no-print * { display: none !important; }
+            .entite-col { display: none !important; }
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #aaa;
-            padding: 6px;
-            font-size: 13px;
-        }
-        th {
-            text-align: center;
-            background-color: #f0f0f0;
-        }
-        td.center {
-            text-align: center;
-        }
-        td.left {
-            text-align: left;
-        }
-        h2 {
-            text-align: center;
-			text-decoration: underline;
-            margin-bottom: 10px;
-        }
-        .btn-retour {
-            margin-bottom: 10px;
-        }
-        .highlight-age {
-            background-color: #d0e7ff;
-        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; table-layout: fixed; }
+        th, td { border: 1px solid #aaa; padding: 6px; font-size: 13px; line-height: 1.2; vertical-align: top; }
+        th { text-align: center; background-color: #f0f0f0; }
+        td.center { text-align: center; }
+        td.left { text-align: left; }
+        h2 { text-align: center; text-decoration: underline; margin: 6px 0 10px; }
+        .btn-retour { margin-bottom: 10px; }
+        .highlight-age { background-color: #d0e7ff; }
+        .actions { display:flex; gap:8px; align-items:center; margin:8px 0 14px 0; }
+        .actions button { padding:6px 10px; }
+
+        /* Forcer les césures/retours dans les colonnes longues */
+        .wrap   { white-space: normal; overflow-wrap: anywhere; word-break: break-word; hyphens: auto; }
+        .nowrap { white-space: nowrap; word-break: keep-all; }
+
+        /* Largeurs de colonnes (pour réduire Nom, Fonction, Entité) */
+        col.col-num        { width: 3%; }
+        col.col-nom        { width: 11%; }   /* ↓ réduit */
+        col.col-matricule  { width: 5%; }
+        col.col-grade      { width: 9%; }
+        col.col-sexe       { width: 4%; }
+        col.col-fonction   { width: 11%; }   /* ↓ réduit */
+        col.col-naissance  { width: 6%; }
+        col.col-age        { width: 3%; }
+        col.col-affect     { width: 7%; }
+        col.col-duree      { width: 7%; }
+        col.col-entite     { width: 9%; }    /* ↓ réduit */
+        /* Total ≈ 97% → laisse un peu de marge au rendu */
     </style>
 </head>
 <body>
-    <h2>{{ titre }}</h2>
+    <h2>{{ titre|safe }}</h2>
 
     <div class="no-print btn-retour">
-        <a href="{% url 'liste_employes' %}">
+        <a href="{% url 'personnel:liste_employes' %}">
             <button style="background-color: blue; color: white;">⬅ Retour à la liste des employés</button>
-        </a>
-        <a href="{% url 'liste_controleurs_pdf' %}?entite={{ selected_entite }}" target="_blank">
-            <button style="background-color: darkgreen; color: white;">🖨️ Imprimer (PDF)</button>
         </a>
     </div>
 
-    <div class="no-print">
-        <form method="get">
+    <div class="no-print actions">
+        <form method="get" style="display:flex; gap:8px; align-items:center;">
             <label for="entite">Trier par entité :</label>
-            <select name="entite" id="entite" onchange="this.form.submit()">
-                <option value="">-- Choisir une entité --</option>
+            <select name="entite" id="entite">
+                <option value="">— Toutes les entités —</option>
                 {% for e in entites %}
                     <option value="{{ e }}" {% if selected_entite == e %}selected{% endif %}>{{ e }}</option>
                 {% endfor %}
             </select>
+            <button type="submit" style="background:#0a7; color:#fff;">Filtrer</button>
+            <a href="{% url 'personnel:liste_controleurs' %}">
+                <button type="button" style="background:#777; color:#fff;">Réinitialiser</button>
+            </a>
         </form>
+
+        {% with q=request.GET.urlencode %}
+            {% if q %}
+                <a href="{% url 'personnel:liste_controleurs_pdf' %}?{{ q }}" target="_blank">
+            {% elif selected_entite %}
+                <a href="{% url 'personnel:liste_controleurs_pdf' %}?entite={{ selected_entite|urlencode }}" target="_blank">
+            {% else %}
+                <a href="{% url 'personnel:liste_controleurs_pdf' %}" target="_blank">
+            {% endif %}
+                <button type="button" style="background: darkgreen; color: white;">🖨️ Imprimer (PDF)</button>
+            </a>
+        {% endwith %}
     </div>
 
     <table>
+        <!-- Définition des largeurs -->
+        <colgroup>
+            <col class="col-num" />
+            <col class="col-nom" />
+            <col class="col-matricule" />
+            <col class="col-grade" />
+            <col class="col-sexe" />
+            <col class="col-fonction" />
+            <col class="col-naissance" />
+            <col class="col-age" />
+            <col class="col-affect" />
+            <col class="col-duree" />
+            <col class="col-entite" />
+        </colgroup>
+
         <thead>
             <tr>
                 <th>N°</th>
-                <th>Nom</th>
-                <th>Matricule</th>
-                <th>Grade actuel</th>
+                <th class="wrap">Nom</th>
+                <th class="nowrap">Matricule</th>
+                <th class="wrap">Grade actuel</th>
                 <th>Sexe</th>
-                <th>Fonction</th>
-                <th>Date naissance</th>
-                <th>Age</th>
-                <th>Date affectation</th>
-                <th>Durée affectation</th>
-                <th class="entite-col">Entité</th>
+                <th class="wrap">Fonction</th>
+                <th class="nowrap">Date naissance</th>
+                <th class="nowrap">Age</th>
+                <th class="nowrap">Date affectation</th>
+                <th class="wrap">Durée affectation</th>
+                <th class="wrap entite-col">Entité</th>
             </tr>
         </thead>
         <tbody>
             {% for item in donnees %}
             <tr {% if item.7 >= 55 %}class="highlight-age"{% endif %}>
                 <td class="center">{{ item.0 }}</td>
-                <td class="left">{{ item.1 }}</td>
-                <td class="center">{{ item.2 }}</td>
-                <td class="left">{{ item.3 }}</td>
+                <td class="left wrap">{{ item.1 }}</td>
+                <td class="center nowrap">{{ item.2 }}</td>
+                <td class="left wrap">{{ item.3 }}</td>
                 <td class="center">{{ item.4 }}</td>
-                <td class="left">{{ item.5 }}</td>
-                <td class="center">{{ item.6 }}</td>
-                <td class="center">{{ item.7 }} an{% if item.7 > 1 %}s{% endif %}</td>
-                <td class="center">{{ item.8 }}</td>
-                <td class="center">{{ item.9 }}</td>
-                <td class="entite-col left">{{ item.10 }}</td>
+                <td class="left wrap">{{ item.5 }}</td>
+                <td class="center nowrap">{{ item.6 }}</td>
+                <td class="center nowrap">
+                    {% if item.7 != '-' %}
+                        {{ item.7 }} an{% if item.7 > 1 %}s{% endif %}
+                    {% else %}-{% endif %}
+                </td>
+                <td class="center nowrap">{{ item.8 }}</td>
+                <td class="center wrap">{{ item.9 }}</td>
+                <td class="entite-col left wrap">{{ item.10 }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,83 +1,91 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        @page {
-            size: landscape;
-            margin: 1cm;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-        }
-        h2 {
-            text-align: center;
-            text-decoration: underline;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th {
-            border: 1px solid #444;
-            padding: 6px;
-            background-color: #f2f2f2;
-            text-align: center;
-        }
-        td {
-            border: 1px solid #444;
-            padding: 6px;
-        }
-        .center {
-            text-align: center;
-        }
-        .left {
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}{{ titre|default:"Liste des Agents en disponibilité" }}{% endblock %}
 
-<h2>{{ titre }}</h2>
+{% block content %}
+<h2 style="text-align: center; text-decoration: underline; font-weight: bold; margin-bottom: 14px;">
+  {{ titre|default:"Liste des Agents en disponibilité" }}
+</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>N°</th>
-            <th>Nom</th>
-			<th>Matricule</th>
-            <th>Grade actuel</th>
-            <th>Sexe</th>
-            <th>Date mise en disponibilité</th>
-            <th>Durée</th>
-            <th>Entité</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for i, agent in donnees.items %}
-        <tr>
-            <td class="center">{{ i }}</td>
-            <td class="left">{{ agent.nom|default:"-" }}</td>
-			<td class="center">{{ agent.matricule|default:"-" }}</td>
-            <td class="left">{{ agent.grade|default:"-" }}</td>
-            <td class="center">{{ agent.sexe|default:"-" }}</td>
-            <td class="center">{{ agent.date_dispo|default:"-" }}</td>
-            <td class="center">
-                {% if agent.duree %}
-                    {{ agent.duree }} {% if agent.duree > 1 %}ans{% else %}an{% endif %}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td class="left">{{ agent.entite|default:"-" }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<table class="tbl">
+  <colgroup>
+    <col /><col /><col /><col /><col /><col /><col /><col />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Matricule</th>
+      <th>Grade actuel</th>
+      <th>Sexe</th>
+      <th>Date mise en disponibilité</th>
+      <th>Durée</th>
+      <th>Entité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i, agent in donnees.items %}
+      <tr>
+        <td>{{ i }}</td>
+        <td>{{ agent.nom|default:"-" }}</td>
+        <td>{{ agent.matricule|default:"-" }}</td>
+        <td>{{ agent.grade|default:"-" }}</td>
+        <td>{{ agent.sexe|default:"-" }}</td>
+        <td>{{ agent.date_dispo|default:"-" }}</td>
+        <td>{{ agent.duree|default:"-" }}</td>
+        <td>{{ agent.entite|default:"-" }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="8" style="text-align:center;">Aucune donnée disponible.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
-</body>
-</html>
+<!-- ✅ Footer réutilisable uniquement visible à l'impression -->
+{% include "personnel/_footer_impression.html" %}
+
+<style>
+  /* Page PDF */
+  @page { size: A4 landscape; margin: 1cm; }
+
+  body { padding-bottom: 60px; } /* ✅ espace pour footer */
+
+  /* Tableau */
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  .tbl th, .tbl td { border: 1px solid #999 !important; padding: 6px; }
+  .tbl thead th { background-color: #B2E0F7 !important; text-align: center; } /* bleu ciel */
+
+  /* Alignements */
+  .tbl td { text-align: center; }
+  .tbl td:nth-child(2),
+  .tbl td:nth-child(4),
+  .tbl td:nth-child(8) {
+    text-align: left !important;
+  }
+
+  /* Largeurs (optionnelles) */
+  col:nth-child(1) { width: 6%; }
+  col:nth-child(2) { width: 20%; }
+  col:nth-child(3) { width: 12%; }
+  col:nth-child(4) { width: 15%; }
+  col:nth-child(5) { width: 6%; }
+  col:nth-child(6) { width: 15%; }
+  col:nth-child(7) { width: 10%; }
+  col:nth-child(8) { width: 16%; }
+
+  /* Par défaut, le footer n'est pas visible */
+  .footer-impression { display: none; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tbl thead th { background-color: #ADD8E6 !important; } /* renfort impression */
+    .tbl th, .tbl td { border: 1px solid #999 !important; }
+
+    /* ✅ Afficher le footer seulement à l'impression */
+    .footer-impression { display: block; }
+  }
+</style>
+{% endblock %}

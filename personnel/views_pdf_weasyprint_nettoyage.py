@@ -1,4 +1,5 @@
 from datetime import date
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string, get_template
 from django.http import HttpResponse
@@ -20,39 +21,62 @@ def nettoyer_unite_ans(texte):
     """
     if not texte:
         return "-"
-    return texte.replace(" ans ans", " ans").replace(" an ans", " an").replace(" an an", " an")
+    return (texte
+            .replace(" ans ans", " ans")
+            .replace(" an ans", " an")
+            .replace(" an an", " an"))
 # --------------------------------
 
 # ... (tout le reste de ton fichier inchangé jusqu'à la fonction liste_licencies_pdf)
 
+@login_required
 def liste_licencies_pdf(request):
     agents = Employe.objects.filter(statut="Licencié").order_by("nom")
+
     donnees = []
     for i, agent in enumerate(agents, start=1):
+        # Carrière = durée entre engagement et date de licenciement (si les 2 existent)
+        carriere = "-"
+        if agent.date_engagement and agent.date_statut:
+            carriere = nettoyer_unite_ans(
+                format_duree(
+                    calcul_duree_detaillee(agent.date_engagement, agent.date_statut)
+                )
+            )
+
         donnee = [
             i,
-            agent.nom,
-            agent.matricule,
-            agent.grade_actuel,
-            agent.sexe,
-            agent.date_engagement,
-            agent.date_statut,
-            # --- Correction appliquée ici ---
-            nettoyer_unite_ans(format_duree(calcul_duree_detaillee(agent.date_engagement))),
-            # --------------------------------
-            agent.entite
+            agent.nom or "-",
+            agent.matricule or "-",
+            agent.grade_actuel or "-",
+            agent.sexe or "-",
+            agent.date_engagement.strftime("%d/%m/%Y") if agent.date_engagement else "-",
+            agent.date_statut.strftime("%d/%m/%Y") if agent.date_statut else "-",
+            carriere,
+            agent.entite or "-",
         ]
         donnees.append(donnee)
 
-    html_string = render_to_string("personnel/liste_licencies_pdf.html", {
-        "titre": "Liste des Agents Licenciés",
-        "colonnes": ["N°", "Nom", "Matricule", "Grade actuel", "Sexe", "Date engagement", "Date licenciement", "Carrière", "Entité"],
-        "donnees": donnees,
-    })
+    html_string = render_to_string(
+        "personnel/liste_licencies_pdf.html",
+        {
+            "titre": "Liste des Agents Licenciés",
+            "colonnes": [
+                "N°", "Nom", "Matricule", "Grade actuel", "Sexe",
+                "Date engagement", "Date licenciement", "Carrière", "Entité"
+            ],
+            "donnees": donnees,
+        }
+    )
 
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
-    css = CSS(string='@page { size: landscape; }')
-    pdf = html.write_pdf(stylesheets=[css])
-    return HttpResponse(pdf, content_type='application/pdf')
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'inline; filename="liste_licencies.pdf"'
+    css = CSS(string='@page { size: A4 landscape; }')
+
+    # base_url pour que WeasyPrint résolve correctement les chemins relatifs (images, css)
+    HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(
+        response, stylesheets=[css]
+    )
+    return response
 
 # ... (tout le reste de ton fichier reste inchangé)

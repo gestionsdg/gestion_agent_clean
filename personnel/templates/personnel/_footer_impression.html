@@ -1,0 +1,26 @@
+{% load tz %}{% load static %}
+<style>
+  /* Pied de page capturé comme "running element" */
+  .footer-impression {
+    font-size: 12px;
+    color: #444;
+    margin: 12px 16px;
+    text-align: right;
+    position: running(footer); /* nom du running element */
+  }
+
+  /* Insérer le running element dans la marge bas-droite de chaque page */
+  @page {
+    /* Tu peux ajuster la marge si besoin */
+    /* margin: 20mm; */
+    @bottom-right {
+      content: element(footer);
+    }
+  }
+</style>
+
+<!-- IMPORTANT : laisser ce bloc TOUT À LA FIN du template PDF,
+juste après ta liste/tableau, pour qu'il n'apparaisse QUE sur la dernière page -->
+<div class="footer-impression" id="footer">
+  <em>Document imprimé le : {% now "d/m/Y H:i" %}</em>
+</div>

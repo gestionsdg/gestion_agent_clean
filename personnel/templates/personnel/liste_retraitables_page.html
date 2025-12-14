@@ -1,0 +1,194 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Retraitables – Page interactive</title>
+  <style>
+    body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 14px; margin: 16px; }
+    h2 { text-align: center; margin: 6px 0 8px; font-size: 22px; }
+    hr.trait-bleu { border: none; height: 2px; background: #1F497D; margin: 10px 0 16px; }
+
+    .barre-actions {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .group { display: flex; gap: 8px; align-items: center; }
+
+    select, button {
+      font-size: 13px; padding: 8px 10px; border-radius: 8px; border: 1px solid #c6c6c6; background: #fff;
+    }
+    button.btn {
+      background: #1F497D; color: #fff; border-color: #1F497D; cursor: pointer;
+    }
+    /* ✅ Bouton retour (bleu + texte blanc gras) */
+    a.btn-back {
+      display:inline-block; background:#0d6efd; color:#fff; font-weight:700; text-decoration:none;
+      padding:8px 12px; border-radius:8px; border:1px solid #0d6efd;
+    }
+    a.btn-back:hover { opacity:.92; }
+
+    button.btn:hover { opacity: .9; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border: 1px solid #444; padding: 6px; }
+    th { background: #f0f0f0; text-align: center; }
+    td.left { text-align: left; }
+    td.center { text-align: center; }
+
+    .badge { display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; border:1px solid #1F497D; color:#1F497D; }
+    .muted { color:#666; font-size: 12px; }
+
+    @media print { .barre-actions { display: none !important; } }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <div style="text-align:left;margin-bottom:6px">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS" style="height:64px;display:block;">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height:64px;display:block;">
+    {% endif %}
+  </div>
+
+  <!-- Titre dynamique -->
+  <h2 id="page-title">Liste des Cadres et Agents retraitables</h2>
+  <hr class="trait-bleu">
+
+  <!-- Barre d’actions -->
+  <div class="barre-actions">
+    <div class="group">
+      <label for="filtreSelect" class="muted">Choisir une catégorie :</label>
+      <select id="filtreSelect" aria-label="Filtrer la liste">
+        <option value="toutes">— Toutes les catégories —</option>
+        <option value="dans_5_ans">Liste des Cadres et Agents retraitables dans cinq ans</option>
+        <option value="dans_4_ans">Liste des Cadres et Agents retraitables dans quatre ans</option>
+        <option value="dans_3_ans">Liste des Cadres et Agents retraitables dans trois ans</option>
+        <option value="dans_2_ans">Liste des Cadres et Agents retraitables dans deux ans</option>
+        <option value="dans_1_an">Liste des Cadres et Agents retraitables dans une année</option>
+        <option value="annee_en_cours">Liste des Cadres et Agents retraitables pour l’année en cours</option>
+      </select>
+      <button class="btn" id="btnFiltrer">Filtrer</button>
+    </div>
+
+    <div class="group">
+      <span id="compteur" class="muted"></span>
+      <button class="btn" id="btnImprimer">🖨️ Imprimer cette liste</button>
+    </div>
+  </div>
+
+  <!-- Bouton Retour à la liste -->
+  <div style="margin: 6px 0 10px;">
+    <a class="btn-back" href="{% url 'personnel:liste_employes' %}">⬅ Retour à la liste</a>
+  </div>
+
+  <!-- Tableau -->
+  <table id="tab-retraitables">
+    <thead>
+      <tr>
+        <th style="width:60px">N°</th>
+        <th>Nom</th>
+        <th>Matricule</th>
+        <th>Grade actuel</th>
+        <th>Sexe</th>
+        <th>Date de naissance</th>
+        <th>Âge</th>
+        <!-- ✅ NOUVELLE COLONNE -->
+        <th>Date départ en retraite</th>
+        <th>Entité</th>
+        <th>Catégorie</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in retraitables %}
+      <tr data-categorie="{{ emp.categorie|default_if_none:'' }}">
+        <td class="center">{{ forloop.counter }}</td>
+        <td class="left">{{ emp.nom }}</td>
+        <td class="center">{{ emp.matricule }}</td>
+        <td class="left">{{ emp.grade }}</td>
+        <td class="center">{{ emp.sexe }}</td>
+        <td class="center">{{ emp.date_naissance|date:"d/m/Y" }}</td>
+        <td class="center">{{ emp.age_str }}</td>
+        <!-- ✅ Valeur attendue depuis la vue : emp.date_depart_retraite = date_naissance + 65 ans -->
+        <td class="center">
+          {% if emp.date_depart_retraite %}{{ emp.date_depart_retraite|date:"d/m/Y" }}{% else %}-{% endif %}
+        </td>
+        <td class="left">{{ emp.entite }}</td>
+        <td class="center"><span class="badge">{{ emp.categorie }}</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="10" class="center">Aucune donnée disponible.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- (Optionnel) Footer réutilisable si tu veux le même bas de page que les PDF -->
+  {# {% include "personnel/_footer_impression.html" %} #}
+
+  <script>
+    (function(){
+      const libelles = {
+        "toutes": "Liste des Cadres et Agents retraitables",
+        "dans_5_ans": "Liste des Cadres et Agents retraitables dans cinq ans",
+        "dans_4_ans": "Liste des Cadres et Agents retraitables dans quatre ans",
+        "dans_3_ans": "Liste des Cadres et Agents retraitables dans trois ans",
+        "dans_2_ans": "Liste des Cadres et Agents retraitables dans deux ans",
+        "dans_1_an": "Liste des Cadres et Agents retraitables dans une année",
+        "annee_en_cours": "Liste des Cadres et Agents retraitables pour l’année en cours"
+      };
+
+      const select = document.getElementById('filtreSelect');
+      const btnFiltrer = document.getElementById('btnFiltrer');
+      const btnImprimer = document.getElementById('btnImprimer');
+      const titre = document.getElementById('page-title');
+      const tbody = document.querySelector('#tab-retraitables tbody');
+      const compteur = document.getElementById('compteur');
+
+      function appliquerFiltre() {
+        const val = select.value || 'toutes';
+        titre.textContent = libelles[val] || libelles['toutes'];
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        let visibles = 0;
+        rows.forEach(tr => {
+          if (val === 'toutes') {
+            tr.style.display = '';
+            visibles++;
+          } else {
+            const cat = (tr.getAttribute('data-categorie') || '').trim();
+            const show = (cat === val);
+            tr.style.display = show ? '' : 'none';
+            if (show) visibles++;
+          }
+        });
+
+        const human = libelles[val] || libelles['toutes'];
+        compteur.textContent = `${human} — Total affiché : ${visibles}`;
+      }
+
+      function imprimerPDF() {
+        const val = select.value || 'toutes';
+        const base = "{% url 'personnel:liste_retraitables_pdf' %}";
+        const url = (val === 'toutes') ? base : `${base}?categorie=${encodeURIComponent(val)}`;
+        window.open(url, "_blank"); // ouvre le PDF filtré dans un nouvel onglet
+      }
+
+      // ✅ le titre change dès que l’on change la sélection
+      select.addEventListener('change', appliquerFiltre);
+
+      // ✅ le bouton "Filtrer" force aussi l’application du filtre
+      btnFiltrer.addEventListener('click', function(e){
+        e.preventDefault();
+        appliquerFiltre();
+      });
+
+      btnImprimer.addEventListener('click', imprimerPDF);
+
+      // ✅ Appel immédiat (script en bas de page → DOM prêt)
+      appliquerFiltre();
+    })();
+  </script>
+</body>
+</html>

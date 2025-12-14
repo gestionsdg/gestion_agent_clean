@@ -4,61 +4,35 @@
     <meta charset="UTF-8">
     <title>Modifier un employé</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .retour {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .retour { text-align: center; margin-bottom: 10px; }
         .retour a {
-            background-color: #555;
-            color: white;
-            padding: 8px 14px;
-            text-decoration: none;
-            border-radius: 4px;
+            background-color: #555; color: white; padding: 8px 14px;
+            text-decoration: none; border-radius: 4px;
         }
         form {
-            max-width: 800px;
-            margin: auto;
-            background: #f7f7f7;
-            padding: 20px;
-            border: 1px solid #ccc;
+            max-width: 800px; margin: auto; background: #f7f7f7;
+            padding: 20px; border: 1px solid #ccc;
         }
-        h2 {
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 6px;
-            margin-top: 5px;
-        }
+        h2 { text-align: center; }
+        label { display: block; margin-top: 10px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 6px; margin-top: 5px; }
         button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: seagreen;
-            color: white;
-            border: none;
+            margin-top: 20px; padding: 10px 20px; background: seagreen;
+            color: white; border: none; cursor: pointer;
         }
-        .photo-preview {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .photo-preview img {
-            max-height: 180px;
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
+        .photo-preview { text-align: center; margin-bottom: 15px; }
+        .photo-preview img { max-height: 180px; border: 1px solid #ccc; padding: 5px; }
+        .errors { color: #b30000; margin: 6px 0 0; font-size: 13px; }
+        .non-field-errors { color: #b30000; margin: 0 0 10px; text-align: center; }
+        .help { color: #666; font-size: 12px; }
+        .current { color: gray; font-size: 12px; margin: 3px 0 10px; }
     </style>
 </head>
 <body>
     <div class="retour">
-        <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
+        <!-- Utilise le nom *namespacé* -->
+        <a href="{% url 'personnel:liste_employes' %}">← Retour à la liste des employés</a>
     </div>
 
     {% if perms.personnel.change_employe %}
@@ -66,6 +40,12 @@
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
             {% if employe.photo %}
                 <div class="photo-preview">
@@ -76,12 +56,24 @@
             {% for field in form %}
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.value == "nan" or field.value == "" %}
-                    <p style="color: gray;">Valeur actuelle : -</p>
-                {% else %}
-                    <p style="color: gray;">Valeur actuelle : {{ field.value }}</p>
+
+                {% if field.help_text %}
+                    <div class="help">{{ field.help_text }}</div>
                 {% endif %}
+
+                {% if field.errors %}
+                    <div class="errors">{{ field.errors }}</div>
+                {% endif %}
+
+                {% with v=field.value|stringformat:"s" %}
+                    {% if not v or v|lower == "nan" %}
+                        <div class="current">Valeur actuelle : -</div>
+                    {% else %}
+                        <div class="current">Valeur actuelle : {{ v }}</div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
+
             <button type="submit">Mettre à jour</button>
         </form>
     {% else %}

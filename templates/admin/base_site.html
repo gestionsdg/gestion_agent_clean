@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+    <style>
+      /* Masque la section "Actions récentes" */
+      #recent-actions-module,
+      .dashboard #recent-actions-module,
+      #content-related #recent-actions-module {
+        display: none !important;
+      }
+
+      /* Style bouton "Accéder au tableau de bord" */
+      .nav-global .dash-link { margin-left: .75rem; }
+      .nav-global .dash-link .button { font-weight: 600; text-decoration: none; }
+
+      /* Style titre personnalisé sur page dashboard admin */
+      body.dashboard #content h1 {
+        color: #007bff;       /* bleu */
+        font-weight: bold;    /* gras */
+        text-decoration: underline; /* souligné */
+      }
+    </style>
+{% endblock %}
+
+{% block branding %}
+    <div style="text-align: center; padding-top: 10px;">
+        <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS" style="height: 80px; margin-bottom: 5px;"><br>
+        <span style="font-weight: bold; font-size: 18px;">Caisse Nationale de Sécurité Sociale</span>
+    </div>
+{% endblock %}
+
+{# Lien visible dans la zone utilisateur #}
+{% block userlinks %}
+  {{ block.super }}
+  <a href="{% url 'dashboard' %}" class="button" style="font-weight: bold;">
+    ➡ Accéder au tableau de bord
+  </a>
+{% endblock %}
+
+{# Personnalisation du titre uniquement sur la page principale du tableau de bord admin #}
+{% block content_title %}
+  <h1>Tableau de bord de l'administration CNSS – Gestion Agents</h1>
+{% endblock %}

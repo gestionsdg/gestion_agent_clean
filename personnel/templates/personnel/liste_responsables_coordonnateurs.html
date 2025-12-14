@@ -1,96 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-  h2 {
-    text-align: center;
-    text-decoration: underline;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 5px;
-    font-size: 13px;
-  }
-  th {
-    text-align: center;
-    background-color: #f2f2f2;
-  }
-  td.center {
-    text-align: center;
-  }
-  td.left {
-    text-align: left;
-  }
+  h2 { text-align: center; text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid #ccc; padding: 5px; font-size: 13px; }
+  th { text-align: center; background-color: #f2f2f2; }
+  td.center { text-align: center; }
+  td.left { text-align: left; }
+
   .filters {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; gap: 10px; flex-wrap: wrap;
   }
-  .filters form {
-    margin: 0 10px;
-  }
+  .filters form { margin: 0; display: inline-flex; align-items: center; gap: 6px; }
 
-  /* Surbrillance spécifique */
-  .bg-fonction {
-    background-color: #d0ecff !important; /* bleu-ciel */
-  }
+  /* Surbrillance décidée en vue */
+  .bg-fonction { background-color: #d0ecff !important; }  /* intérim */
+  .bg-grade   { background-color: #d6f5d6 !important; }  /* grade inférieur */
 
-  .bg-grade {
-    background-color: #d6f5d6 !important; /* vert clair */
-  }
+  .btn { background:#0066cc; color:#fff; border:none; padding:6px 10px; border-radius:5px; cursor:pointer; }
+  .btn-green { background:#28a745; }
+  .btn-grey { background:#6c757d; }
+  a.btn-link { text-decoration:none; }
 </style>
 
 <h2>{{ titre }}</h2>
 
 <div class="filters">
-  <a href="{% url 'liste_employes' %}">
-    <button style="background-color: #0066cc; color: white;">⬅ Retour à la liste des employés</button>
+
+  {# Bouton retour tolérant (namespacé ou non) #}
+  {% url 'personnel:liste_employes' as liste_employes_ns %}{% url 'liste_employes' as liste_employes_plain %}
+  <a class="btn-link" href="{{ liste_employes_ns|default:liste_employes_plain|default:'/employes/' }}">
+    <button class="btn">⬅ Retour à la liste des employés</button>
   </a>
 
-  <form method="get">
-    <label for="entite">Filtrer par entité :</label>
-    <select name="entite" id="entite" onchange="this.form.submit()">
-      <option value="">-- Toutes les entités --</option>
-      {% for ent in entites %}
-        <option value="{{ ent }}" {% if selected_entite == ent %}selected{% endif %}>{{ ent }}</option>
-      {% endfor %}
-    </select>
-  </form>
+  {# === Formulaire de filtre : PAS de reset, juste un bouton "Filtrer" === #}
+  {% if entites %}
+    <form method="get" action="">
+      <label for="entite">Filtrer par entité :</label>
+      <select name="entite" id="entite">
+        <option value="">-- Toutes les entités --</option>
+        {% for ent in entites %}
+          {% if ent %}
+            <option value="{{ ent }}" {% if selected_entite == ent %}selected{% endif %}>{{ ent }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-grey">Filtrer</button>
+    </form>
+  {% endif %}
 
-  <a href="{% url 'liste_responsables_coordonnateurs_pdf' %}?{% if selected_entite %}entite={{ selected_entite }}{% endif %}">
-    <button style="background-color: #28a745; color: white;">🖨️ Imprimer PDF</button>
+  {# Lien PDF qui propage le filtre si présent #}
+  {% url 'personnel:liste_responsables_coordonnateurs_pdf' as pdf_ns %}{% url 'liste_responsables_coordonnateurs_pdf' as pdf_plain %}
+  <a class="btn-link"
+     href="{{ pdf_ns|default:pdf_plain|default:'/responsables-coordonnateurs/pdf/' }}{% if selected_entite %}?entite={{ selected_entite|urlencode }}{% endif %}">
+    <button class="btn btn-green">🖨️ Imprimer PDF</button>
   </a>
 </div>
 
 <table>
   <thead>
     <tr>
-      {% for col in colonnes %}
-        <th>{{ col }}</th>
-      {% endfor %}
+      {% for col in colonnes %}<th>{{ col }}</th>{% endfor %}
     </tr>
   </thead>
   <tbody>
     {% for ligne in donnees %}
-    {% with fonction=ligne.6 grade=ligne.3 %}
-    <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade in 'Chef de Sce Adjt,Chef de Section,Rédacteur Ppal,Rédacteur' %}bg-grade{% endif %}">
-      <td class="center">{{ ligne.0 }}</td>
-      <td class="left">{{ ligne.1 }}</td>
-      <td class="center">{{ ligne.2 }}</td>
-      <td class="left">{{ ligne.3 }}</td>
-      <td class="center">{{ ligne.4 }}</td>
-      <td class="left">{{ ligne.5 }}</td>
-      <td class="left">{{ ligne.6 }}</td>
-      <td class="center">{{ ligne.7 }}</td>
-      <td class="center">{{ ligne.8 }}</td>
-      <td class="left">{{ ligne.9 }}</td>
-    </tr>
-    {% endwith %}
+      {# ligne = [0..9]; 6 = fonction, 3 = grade #}
+      {% with fonction=ligne.6 grade=ligne.3 %}
+      <tr class="{% if fonction == 'Responsable a.i' or fonction == 'Coordonnateur a.i' %}bg-fonction{% elif grade == 'Chef de Sce Adjt' or grade == 'Chef de Section' or grade == 'Rédacteur Ppal' or grade == 'Rédacteur' %}bg-grade{% endif %}">
+        <td class="center">{{ ligne.0 }}</td>
+        <td class="left">{{ ligne.1 }}</td>
+        <td class="center">{{ ligne.2 }}</td>
+        <td class="left">{{ ligne.3 }}</td>
+        <td class="center">{{ ligne.4 }}</td>
+        <td class="left">{{ ligne.5 }}</td>
+        <td class="left">{{ ligne.6 }}</td>
+        <td class="center">{{ ligne.7 }}</td>
+        <td class="center">{{ ligne.8 }}</td>
+        <td class="left">{{ ligne.9 }}</td>
+      </tr>
+      {% endwith %}
+    {% empty %}
+      <tr><td colspan="{{ colonnes|length }}" class="center">Aucun résultat</td></tr>
     {% endfor %}
   </tbody>
 </table>

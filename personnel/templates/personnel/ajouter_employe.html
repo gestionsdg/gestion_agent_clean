@@ -49,7 +49,8 @@
 </head>
 <body>
     <div class="retour">
-        <a href="{% url 'liste_employes' %}">← Retour à la liste des employés</a>
+        <!-- Utiliser le nom *namespacé* -->
+        <a href="{% url 'personnel:liste_employes' %}">← Retour à la liste des employés</a>
     </div>
 
     {% if perms.personnel.add_employe %}

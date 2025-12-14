@@ -43,6 +43,9 @@
   </tbody>
 </table>
 
+<!-- Élément "running" pour n’apparaître qu’à la DERNIÈRE page (WeasyPrint) -->
+<div class="print-stamp-last">Document imprimé : le {% now "d/m/Y H:i" %}</div>
+
 <!-- STYLES CSS -->
 <style>
     .actions {
@@ -58,19 +61,35 @@
         cursor: pointer;
         font-size: 13px;
     }
-    .btn-retour {
-        background-color: #888;
-    }
-    .btn-imprimer {
-        background-color: #007BFF;
-    }
+    .btn-retour { background-color: #888; }
+    .btn-imprimer { background-color: #007BFF; }
+
+    /* Masquer le tampon à l'écran */
+    .print-stamp-last { display: none; }
 
     @media print {
-        .actions {
-            display: none;
+        .actions { display: none; }
+
+        /* Élément "running" utilisé pour le pied de page WeasyPrint */
+        .print-stamp-last {
+            display: block;
+            position: running(doc_stamp);
+            height: 0;          /* ne prend pas de place dans le flux */
+            overflow: hidden;
+            font-size: 11px;
+            color: #555;
+            text-align: right;
         }
+
         @page {
             size: landscape;
+            margin: 20mm 15mm 20mm 15mm;
+            /* Par défaut, aucun contenu en pied de page */
+            @bottom-right { content: none; }
+        }
+        /* Afficher le tampon uniquement sur la DERNIÈRE page */
+        @page :last {
+            @bottom-right { content: element(doc_stamp); }
         }
     }
 </style>

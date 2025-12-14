@@ -1,72 +1,78 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <style>
-    body {
-      font-family: "DejaVu Sans", sans-serif;
-      font-size: 15px;
-    }
-    h2 {
-      text-align: center;
-      text-decoration: underline;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 60%;
-      margin: auto;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 4px;
-    }
-    th {
-      background-color: #d0e7f9;
-      text-align: center;
-    }
-    td.center {
-      text-align: center;
-    }
-    td.left {
-      text-align: left;
-    }
-    tfoot td {
-      font-weight: bold;
-      background-color: #f0f0f0;
-    }
+    body { font-family: "DejaVu Sans", sans-serif; font-size: 15px; padding-bottom: 40px; } /* ✅ espace pour le footer fixé */
+
+    /* En-tête */
+    .logo-top { margin-bottom: 8px; text-align: left; }
+    .logo-top img { height: 80px; display: block; }
+
+    /* ✅ Titre : plus lisible, sans soulignement, taille réduite */
+    h2 { text-align: center; text-decoration: none; font-weight: bold; margin: 0; font-size: 18px; }
+
+    .trait-bleu { border: none; height: 1.5px; background-color: #1F497D; margin: 10px 0 18px 0; }
+
+    table { width: 70%; margin: auto; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; }
+    th { background-color: #d0e7f9; text-align: center; }
+    td.center { text-align: center; }
+    td.left   { text-align: left; }
+    tfoot td { font-weight: bold; background-color: #f0f0f0; }
   </style>
 </head>
 <body>
 
-<h2>{{ titre }}</h2>
+  <!-- ✅ Logo au-dessus du titre (gauche) -->
+  <div class="logo-top">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS">
+    {% endif %}
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>N°</th>
-      <th>Grade actuel</th>
-      <th>Effectif</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for ligne in data %}
+  <!-- ✅ Titre centré (taille réduite, sans soulignement) -->
+  <h2>{{ titre|default:"Effectif des Agents Actifs par Grade" }}</h2>
+
+  <!-- ✅ Trait bleu foncé fin sous le titre -->
+  <hr class="trait-bleu">
+
+  <table>
+    <thead>
       <tr>
-        <td class="center">{{ ligne.numero }}</td>
-        <td class="left">{{ ligne.grade }}</td>
-        <td class="center">{{ ligne.effectif }}</td>
+        <th>N°</th>
+        <th>Grade actuel</th>
+        <th>Effectif</th>
       </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="2" class="center">Total général</td>
-      <td class="center">{{ total_general }}</td>
-    </tr>
-  </tfoot>
-</table>
+    </thead>
+    <tbody>
+      {% if data %}
+        {% for ligne in data %}
+          <tr>
+            <td class="center">{{ ligne.numero|default:forloop.counter }}</td>
+            <td class="left">{{ ligne.grade }}</td>
+            <td class="center">{{ ligne.effectif }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td class="center" colspan="3">Aucune donnée à afficher.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" class="center">Total général</td>
+        <td class="center">{{ total_general }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ✅ Footer d'impression réutilisable -->
+  {% include "personnel/_footer_impression.html" %}
 
 </body>
 </html>

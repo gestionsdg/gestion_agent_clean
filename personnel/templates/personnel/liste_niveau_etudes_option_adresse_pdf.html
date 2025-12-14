@@ -12,7 +12,7 @@
       font-size: 11.5px;
     }
 
-    /* En-tête CNSS */
+    /* En-tête CNSS : logo à gauche, texte en dessous */
     .header-cnss {
       text-align: left;
       margin-bottom: 8px;
@@ -29,33 +29,35 @@
       line-height: 1.2;
     }
 
+    /* Titre */
     h2 {
       text-align: center;
       font-size: 15px;
-      margin: 4px 0 6px 0;
+      margin: 4px 0 4px 0;
       text-decoration: underline;
     }
 
-    /* Zone infos : on n'affiche plus l'entité, seulement la date */
+    /* Ligne de date seule, entre le titre et le tableau */
     .meta {
       font-size: 10px;
-      margin-bottom: 6px;
-      overflow: auto;
+      margin: 2px 0 10px 0;
+      text-align: right;
     }
-    .meta .right {
-      float: right;
+    .meta span {
+      display: inline-block;
     }
 
     /* Tableau principal */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 4px;
+      margin-top: 0;
       font-size: 11px;
     }
 
+    /* Bordures fines gris foncé */
     th, td {
-      border: 1px solid #555;  /* bordures fines gris foncé */
+      border: 1px solid #555;
       padding: 3px 4px;
     }
 
@@ -64,13 +66,13 @@
       text-align: center;
     }
 
+    /* Alignements */
     td.num,
     td.matricule,
     td.sexe {
       text-align: center;
       white-space: nowrap;
     }
-
     td.nom,
     td.grade,
     td.niveau,
@@ -79,16 +81,16 @@
       text-align: left;
     }
 
+    /* Nom et Grade sur une seule ligne */
     td.nom,
     td.grade {
       white-space: nowrap;
     }
-
   </style>
 </head>
 <body>
 
-  <!-- En-tête CNSS -->
+  <!-- En-tête CNSS avec logo à gauche -->
   <div class="header-cnss">
     {% if logo_b64 %}
       <img src="{{ logo_b64 }}" alt="Logo CNSS">
@@ -98,17 +100,15 @@
     </div>
   </div>
 
-  <!-- Titre principal (contient déjà l'entité) -->
+  <!-- Titre -->
   <h2>{{ titre }}</h2>
 
-  <!-- Ligne des infos : on n'affiche que la date -->
+  <!-- Date seule -->
   <div class="meta">
-    <span class="right">
-      <strong>Date :</strong> {{ today|date:"d/m/Y" }}
-    </span>
+    <span><strong>Date :</strong> {{ today|date:"d/m/Y" }}</span>
   </div>
 
-  <!-- Tableau principal -->
+  <!-- Tableau principal SANS colonne Entité, AVEC colonne Option -->
   <table>
     <thead>
       <tr>
@@ -118,14 +118,16 @@
         <th style="width: 35px;">Sexe</th>
         <th style="width: 110px;">Grade actuel</th>
         <th style="width: 120px;">Niveau d'études</th>
-        <th style="width: 130px;">Option</th>
-        <th>Adresse</th>
+        <!-- 🔽 Option réduite -->
+        <th style="width: 100px;">Option</th>
+        <!-- 🔼 Adresse agrandie -->
+        <th style="width: 260px;">Adresse</th>
       </tr>
     </thead>
-
     <tbody>
       {% for row in donnees %}
         <tr>
+          <!-- donnees = [idx, nom, matricule, sexe, grade, niveau, option, adresse] -->
           <td class="num">{{ row.0 }}</td>
           <td class="nom">{{ row.1|clean_nan }}</td>
           <td class="matricule">{{ row.2|clean_nan }}</td>
@@ -137,7 +139,10 @@
         </tr>
       {% empty %}
         <tr>
-          <td colspan="8" style="text-align:center;">Aucun agent trouvé.</td>
+          <!-- 8 colonnes maintenant -->
+          <td colspan="8" style="text-align:center;">
+            Aucun agent trouvé.
+          </td>
         </tr>
       {% endfor %}
     </tbody>

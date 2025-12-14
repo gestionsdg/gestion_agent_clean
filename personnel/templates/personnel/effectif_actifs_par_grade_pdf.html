@@ -1,0 +1,138 @@
+{% load static %} 
+{% load tz %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ titre }}</title>
+  <style>
+    /* Zone imprimable de la page —> passage en PORTRAIT */
+    @page { size: A4 portrait; margin: 14mm; }
+
+    /* Police légèrement plus grande pour l'impression */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      color:#111;
+      padding-bottom: 40px;  /* ✅ espace pour le footer fixé */
+    }
+
+    /* ====== En-tête ====== */
+    .logo-top { margin-bottom: 8px; text-align: left; }
+    .logo-top img { height: 80px; display: block; }
+
+    h1 { 
+      text-align: center; 
+      text-decoration: none;   /* ✅ retrait du soulignement */
+      margin: 0 0 8px 0; 
+      font-size: 20px;         /* ✅ taille légèrement réduite */
+      font-weight: bold;
+    }
+
+    .trait-bleu {
+      border: none;
+      height: 1.5px;
+      background-color: #1F497D;
+      margin: 10px 0 18px 0;
+    }
+
+    /* Marges latérales autour du tableau (on ne change pas @page) */
+    .table-wrap { margin: 0 40mm; }
+
+    table { width:100%; border-collapse: collapse; table-layout: fixed; margin-top: 8px; }
+    th, td { border:1px solid #999; padding:6px; font-size: 14px; }
+    th { text-align:center; background:#eee; }
+
+    /* Alignements */
+    .num   { text-align:center; }
+    .grade { text-align:left; overflow-wrap:anywhere; }
+    .grade-head { text-align:center; }
+    .eff   { text-align:center; }
+
+    /* Largeur indicative de la colonne Grade */
+    .col-grade { width: 120px; }
+
+    tfoot td { font-weight:bold; }
+    .label-total { text-align:center; }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Logo au-dessus du titre (gauche) -->
+  <div class="logo-top">
+    {% if logo_b64 %}
+      <img src="{{ logo_b64 }}" alt="Logo CNSS">
+    {% else %}
+      <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS">
+    {% endif %}
+  </div>
+
+  <!-- ✅ Titre centré -->
+  <h1>{{ titre }}</h1>
+
+  <!-- ✅ Trait bleu foncé fin sous le titre -->
+  <hr class="trait-bleu">
+
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col style="width:15px;">   <!-- N° -->
+        <col class="col-grade">     <!-- Grade -->
+        <col style="width:40px;">   <!-- Effectif (actif) -->
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th class="num">N°</th>
+          <th class="grade-head">Grade</th>
+          <th class="eff">Effectif (actif)</th>
+        </tr>
+      </thead>
+
+      {% if donnees %}
+      <tbody>
+        {% for row in donnees %}
+        <tr>
+          <td class="num">{{ row.0 }}</td>
+          <td class="grade">{{ row.1 }}</td>
+          <td class="eff">{{ row.2 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align:center;">Aucune donnée à afficher.</td></tr>
+        {% endfor %}
+      </tbody>
+
+      {% elif rows %}
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="num">{{ row.rang }}</td>
+          <td class="grade">{{ row.grade }}</td>
+          <td class="eff">{{ row.total }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align:center;">Aucune donnée à afficher.</td></tr>
+        {% endfor %}
+      </tbody>
+
+      {% else %}
+      <tbody>
+        <tr><td colspan="3" style="text-align:center;">Aucune donnée à afficher.</td></tr>
+      </tbody>
+      {% endif %}
+
+      <tfoot>
+        <tr>
+          <!-- ✅ Fusion de la cellule vide + "Total général" -->
+          <td class="label-total" colspan="2">Total général</td>
+          <td class="eff">{{ total_general }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ✅ Footer impression -->
+  {% include "personnel/_footer_impression.html" %}
+
+</body>
+</html>

@@ -1,44 +1,123 @@
+{% load static %} 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Liste des agents actifs</title>
-</head>
-<body style="font-family: Arial, sans-serif; font-size: 14px;">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding-bottom: 40px;
+        }
 
-    <h2 style="text-align: center;"><u>Liste des agents actifs : {{ entite }}</u></h2>
+        /* ✅ Logo en haut à gauche */
+        .logo-top {
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .logo-top img {
+            height: 80px;
+            display: block;
+        }
+
+        /* ✅ Titre centré (sans soulignement, taille augmentée) */
+        h2 {
+            font-size: 22px;   /* ← augmenté pour meilleure lisibilité */
+            margin: 0;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* ✅ Trait bleu foncé */
+        .trait-bleu {
+            border: none;
+            height: 1.5px;
+            background-color: #1F497D;
+            margin: 10px 0 20px 0;
+        }
+
+        /* ✅ Tableau ajusté pour plus de lisibilité */
+        table {
+            width: 95%;  /* ← élargi pour que le tableau occupe plus d’espace */
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-size: 13px;
+            table-layout: fixed; /* ← permet d’imposer les largeurs précises */
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 4px 6px;
+            word-wrap: break-word;
+        }
+
+        /* ✅ Largeurs personnalisées pour les colonnes (tableau du haut) */
+        th:nth-child(1), td:nth-child(1) { width: 4%; text-align: center; }   /* N° */
+        th:nth-child(2), td:nth-child(2) { width: 18%; text-align: left; }    /* Nom ← élargi */
+        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; }  /* Matricule */
+        th:nth-child(4), td:nth-child(4) { width: 6%; text-align: center; }   /* Sexe */
+        th:nth-child(5), td:nth-child(5) { width: 17%; text-align: left; }    /* Grade actuel ← élargi */
+        th:nth-child(6), td:nth-child(6) { width: 17%; text-align: left; }    /* Fonction */
+        th:nth-child(7), td:nth-child(7) { width: 12%; text-align: center; }  /* Date affectation */
+        th:nth-child(8), td:nth-child(8) { width: 10%; text-align: center; }  /* Durée affectation */
+
+        th {
+            background-color: #e0e0e0;
+            text-align: center;
+        }
+
+        td.center { text-align: center; }
+        td.left { text-align: left; }
+
+        h3 {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ✅ Logo -->
+    <div class="logo-top">
+        {% if logo_b64 %}
+            <img src="{{ logo_b64 }}" alt="Logo CNSS">
+        {% else %}
+            <img src="{% static 'images/logo_cnss.png' %}" alt="Logo CNSS">
+        {% endif %}
+    </div>
+
+    <!-- ✅ Titre -->
+    <h2>Liste des agents actifs : {{ entite }}</h2>
+    <hr class="trait-bleu">
 
     {% if cadres_direction %}
         <h3>Cadres de direction</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <table>
            <thead>
-                <tr style="background-color: #e0e0e0;">
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">N°</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Nom</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Matricule</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Sexe</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Grade actuel</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Fonction</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Date affectation</th>
-                    <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">Durée affectation</th>
+                <tr>
+                    <th>N°</th>
+                    <th>Nom</th>
+                    <th>Matricule</th>
+                    <th>Sexe</th>
+                    <th>Grade actuel</th>
+                    <th>Fonction</th>
+                    <th>Date affectation</th>
+                    <th>Durée affectation</th>
                 </tr>
             </thead>
-
             <tbody>
                 {% for ligne in lignes %}
                     <tr>
                         {% for val in ligne %}
-                            {% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 4 or forloop.counter == 6 or forloop.counter == 7 %}
-                                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">
-                            {% elif forloop.counter == 2 or forloop.counter == 5 %}
-                                <td style="border: 1px solid #ccc; padding: 5px; text-align: left;">
-                            {% elif forloop.counter == 8 %}
-                                <td style="border: 1px solid #ccc; padding: 5px; text-align: center;">
+                            {% if forloop.counter in "13478" %}
+                                <td class="center">{{ val|default:"-" }}</td>
+                            {% elif forloop.counter in "256" %}
+                                <td class="left">{{ val|default:"-" }}</td>
                             {% else %}
-                                <td style="border: 1px solid #ccc; padding: 5px;">
+                                <td>{{ val|default:"-" }}</td>
                             {% endif %}
-                                {{ val|default:"-" }}
-                            </td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -48,12 +127,29 @@
 
     {% for service, cadres, lignes in donnees_groupes %}
     {% if lignes %}
-        <h3 style="margin-top: 20px;">Service : {{ service }}</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <h3>Service : {{ service }}</h3>
+        <table>
             <thead>
-                <tr style="background-color: #e0e0e0;">
+                <tr>
                     {% for col in colonnes %}
-                        <th style="border: 1px solid #ccc; padding: 6px; text-align: center;">{{ col }}</th>
+                        {# ✅ on force ici aussi les largeurs, pour que Nom et Grade ne se cassent plus #}
+                        {% if forloop.counter == 1 %}
+                            <th style="width:4%;">{{ col }}</th>
+                        {% elif forloop.counter == 2 %}
+                            <th style="width:18%; text-align:left;">{{ col }}</th>   {# Nom ← même largeur que le haut #}
+                        {% elif forloop.counter == 3 %}
+                            <th style="width:10%;">{{ col }}</th>
+                        {% elif forloop.counter == 4 %}
+                            <th style="width:6%;">{{ col }}</th>
+                        {% elif forloop.counter == 5 %}
+                            <th style="width:17%; text-align:left;">{{ col }}</th>  {# Grade actuel ← élargi #}
+                        {% elif forloop.counter == 6 %}
+                            <th style="width:17%; text-align:left;">{{ col }}</th>
+                        {% elif forloop.counter == 7 %}
+                            <th style="width:12%;">{{ col }}</th>
+                        {% else %}
+                            <th style="width:10%;">{{ col }}</th>
+                        {% endif %}
                     {% endfor %}
                 </tr>
             </thead>
@@ -61,22 +157,23 @@
                 {% for ligne in lignes %}
                     <tr>
                         {% for val in ligne %}
-							{% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 4 or forloop.counter == 7 or forloop.counter == 8 %}
-								<td style="border: 1px solid #ccc; padding: 5px; text-align: center;">
-							{% elif forloop.counter == 2 or forloop.counter == 5 or forloop.counter == 6 or forloop.counter == 9 %}
-								<td style="border: 1px solid #ccc; padding: 5px; text-align: left;">
+                            {% if forloop.counter in "13478" %}
+                                <td class="center">{{ val|default:"-" }}</td>
+                            {% elif forloop.counter in "2569" %}
+                                <td class="left">{{ val|default:"-" }}</td>
                             {% else %}
-                                <td style="border: 1px solid #ccc; padding: 5px;">
+                                <td>{{ val|default:"-" }}</td>
                             {% endif %}
-                                {{ val|default:"-" }}
-                            </td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% endif %}
-{% endfor %}
+    {% endfor %}
+
+    <!-- ✅ Footer impression -->
+    {% include "personnel/_footer_impression.html" %}
 
 </body>
 </html>

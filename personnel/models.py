@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.functional import cached_property  # ← AJOUT
 
 # ==== CHOIX ====
 
@@ -40,8 +41,8 @@ ENTITE_CHOICES = [
     ('Direction des Services Généraux', 'Direction des Services Généraux'),
     ('Direction de Recouvrement', 'Direction de Recouvrement'),
     ('Direction de Prévention', 'Direction de Prévention'),
-    ('Direction de l\'Audit Interne', 'Direction de l\'Audit Interne'),
-    ('Direction de l\'Action San et Soc', 'Direction de l\'Action San et Soc'),
+    ("Direction de l'Audit Interne", "Direction de l'Audit Interne"),
+    ("Direction de l'Action San et Soc", "Direction de l'Action San et Soc"),
     ('Direction de Formation', 'Direction de Formation'),
     ('Dir. de la Gestion Imm-Ouest', 'Dir. de la Gestion Imm-Ouest'),
     ('Pompes Funèbres Pop', 'Pompes Funèbres Pop'),
@@ -59,10 +60,12 @@ ENTITE_CHOICES = [
     ('CP Révolution/Duk-Nord', 'CP Révolution/Duk-Nord'),
     ('CP Makala/Duk-Centre', 'CP Makala/Duk-Centre'),
     ('CP Lemba/Duk-Sud', 'CP Lemba/Duk-Sud'),
+    ('CP Matete/Duk-Sud', 'CP Matete/Duk-Sud'),  # ✅ AJOUT ICI
     ('CP Kinshasa/Duk-Centre', 'CP Kinshasa/Duk-Centre'),
     ('CP Kimbanseke/Duk-Est', 'CP Kimbanseke/Duk-Est'),
     ('CP Commerce/Duk-Nord', 'CP Commerce/Duk-Nord'),
     ('CP Golf/Lubumbashi', 'CP Golf/Lubumbashi'),
+    ('CP Kenya/Lubumbashi', 'CP Kenya/Lubumbashi'),  # ✅ ajout après "CP Golf/Lubumbashi"
     ('Corps de Surveillance', 'Corps de Surveillance'),
     ('DP Uvira', 'DP Uvira'),
     ('DP Tanganyika', 'DP Tanganyika'),
@@ -85,9 +88,9 @@ ENTITE_CHOICES = [
     ('DP Boma', 'DP Boma'),
     ('DP Bandundu', 'DP Bandundu'),
     ('Dir. de la Gestion Imm-Est', 'Dir. de la Gestion Imm-Est'),
-    ('Bureau d\'Isiro', 'Bureau d\'Isiro'),
-    ('Bureau d\'Inongo', 'Bureau d\'Inongo'),
-    ('Bureau d\'Ilebo', 'Bureau d\'Ilebo'),
+    ("Bureau d'Isiro", "Bureau d'Isiro"),
+    ("Bureau d'Inongo", "Bureau d'Inongo"),
+    ("Bureau d'Ilebo", "Bureau d'Ilebo"),
     ('Bureau de Tshikapa', 'Bureau de Tshikapa'),
     ('Bureau de Mwene-Ditu', 'Bureau de Mwene-Ditu'),
     ('Bureau de Lodja', 'Bureau de Lodja'),
@@ -99,8 +102,8 @@ ENTITE_CHOICES = [
     ('Bureau de Butembo', 'Bureau de Butembo'),
     ('Bureau de Buta', 'Bureau de Buta'),
     ('Bureau de Boende', 'Bureau de Boende'),
-    ('Antenne d\'Idiofa', 'Antenne d\'Idiofa'),
-    ('Antenne de Watsa', 'Antenne de Watsa'),
+    ("Antenne d'Idiofa", "Antenne d'Idiofa"),
+    ("Antenne de Watsa", "Antenne de Watsa"),
     ('Antenne de Tshimbulu', 'Antenne de Tshimbulu'),
     ('Antenne de Sandoa', 'Antenne de Sandoa'),
     ('Antenne de Rutshuru', 'Antenne de Rutshuru'),
@@ -118,7 +121,7 @@ ENTITE_CHOICES = [
     ('Antenne de Dilolo', 'Antenne de Dilolo'),
     ('Antenne de Bumba', 'Antenne de Bumba'),
     ('Antenne de Beni', 'Antenne de Beni'),
-    ('Antenne d\'Aru', 'Antenne d\'Aru'),
+    ("Antenne d'Aru", "Antenne d'Aru"),
 ]
 
 ETAT_CIVIL_CHOICES = [
@@ -187,3 +190,15 @@ class Employe(models.Model):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
+
+    @cached_property
+    def photo_url(self) -> str:
+        """
+        URL d'image safe pour le HTML/PDF (remplace les antislashs Windows).
+        Retourne '' si la photo est absente ou inaccessible.
+        """
+        try:
+            url = self.photo.url  # peut lever si pas de fichier
+        except Exception:
+            return ""
+        return url.replace("\\", "/")

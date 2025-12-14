@@ -1,71 +1,92 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      font-family: "DejaVu Sans", sans-serif;
-      font-size: 12px;
-    }
-    h2 {
-      text-align: center;
-      text-decoration: underline;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 5px;
-    }
-    th {
-      background-color: #d0e7f9; /* bleu ciel */
-      text-align: center;
-    }
+{% extends 'base.html' %}
+{% block title %}{{ titre|default:"Liste des Agents en détachement" }}{% endblock %}
 
-    /* Largeur ajustée des colonnes */
-    th:nth-child(2), td:nth-child(2) { width: 20%; }  /* Nom */
-    th:nth-child(4), td:nth-child(4) { width: 15%; }  /* Grade actuel */
-    th:nth-child(8), td:nth-child(8) { width: 15%; }  /* Durée */
-    th:nth-child(6), td:nth-child(6) { width: 10%; }  /* Date détachement */
-    th:nth-child(7), td:nth-child(7) { width: 10%; }  /* Date fin détachement */
+{% block content %}
+<h2 style="text-align: center; text-decoration: underline; font-weight: bold; margin-bottom: 14px;">
+  {{ titre|default:"Liste des Agents en détachement" }}
+</h2>
 
-    td.center {
-      text-align: center;
-    }
-    td.left {
-      text-align: left;
-    }
-  </style>
-</head>
-<body>
-
-<h2>{{ titre|safe }}</h2>
-
-<table>
+<table class="tbl">
+  <colgroup>
+    <col /><col /><col /><col /><col /><col /><col /><col /><col />
+  </colgroup>
   <thead>
     <tr>
-      {% for col in colonnes %}
-        <th>{{ col }}</th>
-      {% endfor %}
+      {% if colonnes %}
+        {% for col in colonnes %}
+          <th>{{ col }}</th>
+        {% endfor %}
+      {% else %}
+        <th>N°</th>
+        <th>Nom</th>
+        <th>Matricule</th>
+        <th>Grade actuel</th>
+        <th>Sexe</th>
+        <th>Date détachement</th>
+        <th>Date fin détachement</th>
+        <th>Durée</th>
+        <th>Entité</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
-    {% for item in donnees %}
-    <tr>
-      {% for val in item %}
-        <td class="{% if forloop.counter in '1,3,5,6,7,8' %}center{% else %}left{% endif %}">
-          {{ val|default:"-" }}
-        </td>
-      {% endfor %}
-    </tr>
+    {% for row in donnees %}
+      <tr>
+        {% for val in row %}
+          <td>{{ val|default:"-" }}</td>
+        {% endfor %}
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="9" style="text-align:center;">Aucune donnée disponible.</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>
 
-</body>
-</html>
+<!-- ✅ Footer réutilisable pour l’impression -->
+{% include "personnel/_footer_impression.html" %}
+
+<style>
+  /* Page PDF */
+  @page { size: A4 landscape; margin: 1cm; }
+
+  body { padding-bottom: 60px; } /* ✅ espace pour le footer */
+
+  /* Tableau */
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  .tbl th, .tbl td { border: 1px solid #999 !important; padding: 6px; }
+  .tbl thead th { background-color: #B2E0F7 !important; text-align: center; }
+
+  /* Alignements */
+  .tbl td { text-align: center; }
+  .tbl td:nth-child(2),
+  .tbl td:nth-child(4),
+  .tbl td:nth-child(9) { text-align: left !important; }
+
+  /* Largeurs optionnelles */
+  col:nth-child(1) { width: 6%; }
+  col:nth-child(2) { width: 20%; }
+  col:nth-child(3) { width: 12%; }
+  col:nth-child(4) { width: 15%; }
+  col:nth-child(5) { width: 6%; }
+  col:nth-child(6) { width: 11%; }
+  col:nth-child(7) { width: 12%; }
+  col:nth-child(8) { width: 8%; }
+  col:nth-child(9) { width: 10%; }
+
+  /* Par défaut, le footer n'apparaît pas */
+  .footer-impression { display: none; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tbl thead th { background-color: #ADD8E6 !important; }
+    .tbl th, .tbl td { border: 1px solid #999 !important; }
+
+    /* Afficher le footer uniquement à l'impression */
+    .footer-impression { display: block; }
+  }
+</style>
+{% endblock %}
