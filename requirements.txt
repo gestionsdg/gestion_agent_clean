@@ -4,6 +4,7 @@ cffi==1.17.1
 cssselect2==0.8.0
 dj-database-url==3.0.1
 Django==4.2.23
+django-csp==4.0
 django-widget-tweaks==1.5.0
 et_xmlfile==2.0.0
 fonttools==4.58.1
